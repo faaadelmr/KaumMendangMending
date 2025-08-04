@@ -19,7 +19,7 @@ export type FindPhoneSpecsInput = z.infer<typeof FindPhoneSpecsInputSchema>;
 const FindPhoneSpecsOutputSchema = z.object({
   brand: z.string().describe("The brand name of the phone, e.g., 'Google', 'Apple'."),
   model: z.string().describe("The specific model name of the phone, e.g., 'Pixel 8 Pro', 'iPhone 15 Pro'."),
-  image: z.string().url().describe("A URL for a high-quality image of the phone."),
+  image: z.string().describe("A URL for a high-quality image of the phone."),
   specs: z.object({
     announced: z.string().describe("The announcement date of the phone."),
     displaySize: z.string().describe("The size of the display in inches."),
