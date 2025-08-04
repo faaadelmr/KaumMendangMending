@@ -80,6 +80,27 @@ const getBestSpec = (specKey: keyof Spec, phones: Phone[]): string | null => {
   return isTie ? null : bestPhone.specs[specKey];
 };
 
+type SpecGroup = {
+    label: string;
+    keys: (keyof Spec)[];
+    isCompact: boolean;
+};
+
+const specStructure: SpecGroup[] = [
+    { label: specLabels.announced, keys: ['announced'], isCompact: false },
+    { label: "Display", keys: ['displaySize', 'displayResolution', 'displayProtection'], isCompact: true },
+    { label: "Platform", keys: ['os', 'osUpdate', 'processorChipset', 'processorCpu', 'processorGpu'], isCompact: true },
+    { label: specLabels.storageRam, keys: ['storageRam'], isCompact: false },
+    { label: "Main Camera", keys: ['mainCameraModules', 'mainCameraFeatures', 'mainCameraVideo'], isCompact: true },
+    { label: "Selfie Camera", keys: ['selfieCameraModules', 'selfieCameraFeatures', 'selfieCameraVideo'], isCompact: true },
+    { label: specLabels.nfc, keys: ['nfc'], isCompact: false },
+    { label: specLabels.usb, keys: ['usb'], isCompact: false },
+    { label: specLabels.sensors, keys: ['sensors'], isCompact: false },
+    { label: "Battery", keys: ['batteryType', 'batteryCharging'], isCompact: true },
+    { label: specLabels.price, keys: ['price'], isCompact: false },
+];
+
+
 export default function PhoneComparison({ phones }: PhoneComparisonProps) {
   if (phones.length === 0) {
     return (
@@ -89,8 +110,6 @@ export default function PhoneComparison({ phones }: PhoneComparisonProps) {
       </div>
     );
   }
-
-  const specKeys = Object.keys(specLabels) as (keyof Spec)[];
 
   const gridColsClass = 
     phones.length === 1 ? 'md:grid-cols-1' :
@@ -118,20 +137,27 @@ export default function PhoneComparison({ phones }: PhoneComparisonProps) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {specKeys.map(key => {
-                const bestSpecValue = getBestSpec(key, phones);
+              {specStructure.map((group, index) => {
+                const bestSpecValue = !group.isCompact ? getBestSpec(group.keys[0], phones) : null;
                 return (
-                  <TableRow key={key}>
-                    <TableCell className="font-bold font-body">{specLabels[key]}</TableCell>
+                  <TableRow key={index}>
+                    <TableCell className="font-bold font-body align-top">{group.label}</TableCell>
                     {phones.map(phone => {
-                      const isBest = phone.specs[key] === bestSpecValue;
+                      const isBest = !group.isCompact && phone.specs[group.keys[0]] === bestSpecValue;
                       return (
                         <TableCell key={phone.id} className={`text-center transition-all text-xs ${isBest ? 'bg-accent/10' : ''}`}>
-                          <div className={`inline-block p-2 rounded-md ${isBest ? 'bg-accent text-accent-foreground shadow-lg' : ''}`}>
-                            <span className="flex items-center justify-center gap-2 font-body text-base">
+                          <div className={`inline-block p-2 rounded-md w-full text-left ${isBest ? 'bg-accent text-accent-foreground shadow-lg' : ''}`}>
+                            <div className="flex items-center justify-center gap-2 font-body text-base">
                               {isBest && <Trophy className="w-4 h-4 shrink-0" />}
-                              {phone.specs[key]}
-                            </span>
+                              <div className='w-full'>
+                                {group.keys.map(key => (
+                                    <p key={key} className="text-sm">
+                                      {group.isCompact && <span className="font-semibold">{specLabels[key]}: </span>}
+                                      {phone.specs[key]}
+                                    </p>
+                                ))}
+                              </div>
+                            </div>
                           </div>
                         </TableCell>
                       );
