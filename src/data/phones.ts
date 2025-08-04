@@ -1,9 +1,44 @@
 export type Spec = {
-  display: string;
-  camera: string;
-  battery: string;
-  processor: string;
-  storage: string;
+  // LAUNCH
+  announced: string;
+
+  // DISPLAY
+  displaySize: string;
+  displayResolution: string;
+  displayProtection: string;
+
+  // PLATFORM
+  os: string;
+  osUpdate: string;
+  processorChipset: string;
+  processorCpu: string;
+  processorGpu: string;
+
+  // STORAGE
+  storageRam: string;
+
+  // MAIN CAMERA
+  mainCameraModules: string;
+  mainCameraFeatures: string;
+  mainCameraVideo: string;
+
+  // SELFIE CAMERA
+  selfieCameraModules: string;
+  selfieCameraFeatures: string;
+  selfieCameraVideo: string;
+
+  // COMMS
+  nfc: string;
+  usb: string;
+
+  // FEATURES
+  sensors: string;
+
+  // BATTERY
+  batteryType: string;
+  batteryCharging: string;
+
+  // MISC
   price: string;
 };
 
@@ -23,11 +58,27 @@ export const phones: Phone[] = [
     model: 'G-Phone 8 Pro',
     image: 'https://placehold.co/400x400.png',
     specs: {
-      display: '6.7" Super Actua',
-      camera: '50MP Wide',
-      battery: '5050 mAh',
-      processor: 'Tensor G3',
-      storage: '256 GB',
+      announced: "2023, October 4",
+      displaySize: "6.7 inches",
+      displayResolution: "1344 x 2992 pixels",
+      displayProtection: "Gorilla Glass Victus 2",
+      os: "Android 14",
+      osUpdate: "7 years of OS updates",
+      processorChipset: "Tensor G3 (4 nm)",
+      processorCpu: "Nona-core",
+      processorGpu: "Immortalis-G715s MC10",
+      storageRam: "128GB 12GB RAM, 256GB 12GB RAM, 512GB 12GB RAM, 1TB 12GB RAM",
+      mainCameraModules: "50MP (wide), 48MP (telephoto), 48MP (ultrawide)",
+      mainCameraFeatures: "Pixel Shift, Ultra-HDR, Magic Editor",
+      mainCameraVideo: "4K@30/60fps, 1080p@30/60/120/240fps",
+      selfieCameraModules: "10.5MP (ultrawide)",
+      selfieCameraFeatures: "Auto-HDR, panorama",
+      selfieCameraVideo: "4K@24/30/60fps, 1080p@30/60fps",
+      nfc: "Yes",
+      usb: "USB Type-C 3.2",
+      sensors: "Fingerprint (under display, optical), accelerometer, gyro, proximity, compass, barometer, thermometer (skin)",
+      batteryType: "Li-Ion 5050 mAh, non-removable",
+      batteryCharging: "30W wired, PD3.0, PPS, 50% in 30 min (advertised), 23W wireless, Reverse wireless",
       price: '$999',
     },
     reviews: [
@@ -44,11 +95,27 @@ export const phones: Phone[] = [
     model: 'Galaxy Z24 Ultra',
     image: 'https://placehold.co/400x400.png',
     specs: {
-      display: '6.8" Dynamic AMOLED',
-      camera: '200MP Wide',
-      battery: '5000 mAh',
-      processor: 'Snapdragon 9 Gen 3',
-      storage: '512 GB',
+      announced: "2024, January 17",
+      displaySize: "6.8 inches",
+      displayResolution: "1440 x 3120 pixels",
+      displayProtection: "Gorilla Armor",
+      os: "Android 14, One UI 6.1",
+      osUpdate: "7 years of OS/security updates",
+      processorChipset: "Snapdragon 8 Gen 3 for Galaxy (4 nm)",
+      processorCpu: "Octa-core",
+      processorGpu: "Adreno 750 (1 GHz)",
+      storageRam: "256GB 12GB RAM, 512GB 12GB RAM, 1TB 12GB RAM",
+      mainCameraModules: "200MP (wide), 50MP (periscope telephoto), 10MP (telephoto), 12MP (ultrawide)",
+      mainCameraFeatures: "LED flash, auto-HDR, panorama",
+      mainCameraVideo: "8K@24/30fps, 4K@30/60/120fps, 1080p@30/60/240fps, 1080p@960fps",
+      selfieCameraModules: "12MP (wide)",
+      selfieCameraFeatures: "Dual video call, Auto-HDR, HDR10+",
+      selfieCameraVideo: "4K@30/60fps, 1080p@30fps",
+      nfc: "Yes",
+      usb: "USB Type-C 3.2, OTG",
+      sensors: "Fingerprint (under display, ultrasonic), accelerometer, gyro, proximity, compass, barometer",
+      batteryType: "Li-Ion 5000 mAh, non-removable",
+      batteryCharging: "45W wired, PD3.0, 65% in 30 min (advertised), 15W wireless (Qi/PMA), 4.5W reverse wireless",
       price: '$1299',
     },
     reviews: [
@@ -65,11 +132,27 @@ export const phones: Phone[] = [
     model: 'iFruit 15 Pro',
     image: 'https://placehold.co/400x400.png',
     specs: {
-      display: '6.1" Super Retina',
-      camera: '48MP Main',
-      battery: '3274 mAh',
-      processor: 'A17 Pro',
-      storage: '256 GB',
+      announced: "2023, September 12",
+      displaySize: "6.1 inches",
+      displayResolution: "1179 x 2556 pixels",
+      displayProtection: "Ceramic Shield glass",
+      os: "iOS 17, upgradable to iOS 17.5.1",
+      osUpdate: "Up to 5-6 years of OS updates",
+      processorChipset: "A17 Pro (3 nm)",
+      processorCpu: "Hexa-core (2x3.78 GHz + 4x2.11 GHz)",
+      processorGpu: "Apple GPU (6-core graphics)",
+      storageRam: "128GB 8GB RAM, 256GB 8GB RAM, 512GB 8GB RAM, 1TB 8GB RAM",
+      mainCameraModules: "48MP (wide), 12MP (telephoto), 12MP (ultrawide)",
+      mainCameraFeatures: "Dual-LED dual-tone flash, HDR (photo/panorama)",
+      mainCameraVideo: "4K@24/25/30/60fps, 1080p@25/30/60/120/240fps, 10-bit HDR, Dolby Vision HDR (up to 60fps), ProRes, Cinematic mode",
+      selfieCameraModules: "12MP (wide)",
+      selfieCameraFeatures: "HDR, Cinematic mode (4K@24/30fps)",
+      selfieCameraVideo: "4K@24/25/30/60fps, 1080p@25/30/60/120fps",
+      nfc: "Yes",
+      usb: "USB Type-C 3.0, DisplayPort",
+      sensors: "Face ID, accelerometer, gyro, proximity, compass, barometer",
+      batteryType: "Li-Ion 3274 mAh, non-removable",
+      batteryCharging: "Wired, PD2.0, 50% in 30 min (advertised), 15W wireless (MagSafe), 7.5W wireless (Qi), 4.5W reverse wired",
       price: '$999',
     },
     reviews: [
@@ -86,11 +169,27 @@ export const phones: Phone[] = [
     model: '12 Pro',
     image: 'https://placehold.co/400x400.png',
     specs: {
-      display: '6.82" ProXDR',
-      camera: '50MP Wide',
-      battery: '5400 mAh',
-      processor: 'Snapdragon 9 Gen 3',
-      storage: '512 GB',
+      announced: "2024, January 23",
+      displaySize: "6.82 inches",
+      displayResolution: "1440 x 3168 pixels",
+      displayProtection: "Gorilla Glass Victus 2",
+      os: "Android 14, OxygenOS 14",
+      osUpdate: "4 years OS, 5 years security updates",
+      processorChipset: "Snapdragon 8 Gen 3 (4 nm)",
+      processorCpu: "Octa-core",
+      processorGpu: "Adreno 750",
+      storageRam: "256GB 12GB RAM, 512GB 16GB RAM",
+      mainCameraModules: "50MP (wide), 64MP (periscope telephoto), 48MP (ultrawide)",
+      mainCameraFeatures: "Hasselblad Color Calibration, Dual-LED flash, HDR, panorama",
+      mainCameraVideo: "8K@24fps, 4K@30/60fps, 1080p@30/60/240/480fps, Auto HDR, gyro-EIS, Dolby Vision",
+      selfieCameraModules: "32MP (wide)",
+      selfieCameraFeatures: "Auto-HDR, panorama",
+      selfieCameraVideo: "4K@30fps, 1080p@30fps",
+      nfc: "Yes",
+      usb: "USB Type-C 3.2, OTG",
+      sensors: "Fingerprint (under display, optical), accelerometer, gyro, proximity, compass, color spectrum",
+      batteryType: "Li-Po 5400 mAh, non-removable",
+      batteryCharging: "100W wired, 1-100% in 26 min (advertised), 50W wireless, 1-100% in 55 min (advertised), 10W reverse wireless",
       price: '$899',
     },
     reviews: [
@@ -104,10 +203,26 @@ export const phones: Phone[] = [
 ];
 
 export const specLabels: Record<keyof Spec, string> = {
-  display: "Display",
-  camera: "Camera",
-  battery: "Battery",
-  processor: "Processor",
-  storage: "Storage",
+  announced: "Announced",
+  displaySize: "Display Size",
+  displayResolution: "Display Resolution",
+  displayProtection: "Display Protection",
+  os: "OS",
+  osUpdate: "OS Update Promise",
+  processorChipset: "Chipset",
+  processorCpu: "CPU",
+  processorGpu: "GPU",
+  storageRam: "Storage & RAM",
+  mainCameraModules: "Main Camera Modules",
+  mainCameraFeatures: "Main Camera Features",
+  mainCameraVideo: "Main Camera Video",
+  selfieCameraModules: "Selfie Camera Modules",
+  selfieCameraFeatures: "Selfie Camera Features",
+  selfieCameraVideo: "Selfie Camera Video",
+  nfc: "NFC",
+  usb: "Charging Port",
+  sensors: "Sensors",
+  batteryType: "Battery",
+  batteryCharging: "Charging",
   price: "Price",
 };

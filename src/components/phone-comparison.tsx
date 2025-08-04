@@ -26,8 +26,22 @@ const getBestSpec = (specKey: keyof Spec, phones: Phone[]): string | null => {
   let bestPhone = phones[0];
 
   for (let i = 1; i < phones.length; i++) {
-    const currentNumeric = getNumericValue(phones[i].specs[specKey]);
-    const bestNumeric = getNumericValue(bestPhone.specs[specKey]);
+    const currentSpec = phones[i].specs[specKey];
+    const bestSpec = bestPhone.specs[specKey];
+
+    // Handle special cases that are not simple numeric comparisons
+    if (specKey === 'batteryType') {
+        const currentNumeric = getNumericValue(currentSpec);
+        const bestNumeric = getNumericValue(bestSpec);
+        if (currentNumeric > bestNumeric) {
+            bestPhone = phones[i];
+        }
+        continue;
+    }
+    
+    // Default numeric comparison
+    const currentNumeric = getNumericValue(currentSpec);
+    const bestNumeric = getNumericValue(bestSpec);
 
     if (currentNumeric === 0 && bestNumeric === 0) continue; // Skip non-numeric specs
 
@@ -43,10 +57,25 @@ const getBestSpec = (specKey: keyof Spec, phones: Phone[]): string | null => {
   }
 
   // Check if there is a clear winner (no ties)
-  const bestValue = getNumericValue(bestPhone.specs[specKey]);
-  if (bestValue === 0) return null; // No winner for non-numeric specs
+  let bestValue = bestPhone.specs[specKey];
+  if (specKey === 'batteryType') {
+    bestValue = getNumericValue(bestValue).toString();
+  } else {
+    bestValue = getNumericValue(bestValue).toString();
+  }
+  
+  if (bestValue === '0' && specKey !== 'price') return null; // No winner for non-numeric specs
 
-  const isTie = phones.some(p => p.id !== bestPhone.id && getNumericValue(p.specs[specKey]) === bestValue);
+  const isTie = phones.some(p => {
+    let pValue = p.specs[specKey];
+    if (specKey === 'batteryType') {
+        pValue = getNumericValue(pValue).toString();
+    } else {
+        pValue = getNumericValue(pValue).toString();
+    }
+    return p.id !== bestPhone.id && pValue === bestValue;
+  });
+
 
   return isTie ? null : bestPhone.specs[specKey];
 };
@@ -80,7 +109,7 @@ export default function PhoneComparison({ phones }: PhoneComparisonProps) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[120px] font-headline text-lg text-primary-foreground/90">Feature</TableHead>
+                <TableHead className="w-[180px] font-headline text-lg text-primary-foreground/90">Feature</TableHead>
                 {phones.map(phone => (
                   <TableHead key={phone.id} className="text-center font-headline text-lg text-primary-foreground/90">
                     {phone.model}
@@ -97,7 +126,7 @@ export default function PhoneComparison({ phones }: PhoneComparisonProps) {
                     {phones.map(phone => {
                       const isBest = phone.specs[key] === bestSpecValue;
                       return (
-                        <TableCell key={phone.id} className={`text-center transition-all ${isBest ? 'bg-accent/10' : ''}`}>
+                        <TableCell key={phone.id} className={`text-center transition-all text-xs ${isBest ? 'bg-accent/10' : ''}`}>
                           <div className={`inline-block p-2 rounded-md ${isBest ? 'bg-accent text-accent-foreground shadow-lg' : ''}`}>
                             <span className="flex items-center justify-center gap-2 font-body text-base">
                               {isBest && <Trophy className="w-4 h-4 shrink-0" />}
