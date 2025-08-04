@@ -19,7 +19,7 @@ export type FindPhoneSpecsInput = z.infer<typeof FindPhoneSpecsInputSchema>;
 const FindPhoneSpecsOutputSchema = z.object({
   brand: z.string().describe("The brand name of the phone, e.g., 'Google', 'Apple'."),
   model: z.string().describe("The specific model name of the phone, e.g., 'Pixel 8 Pro', 'iPhone 15 Pro'."),
-  image: z.string().describe("A placeholder image URL for the phone, in the format 'https://placehold.co/400x400.png'."),
+  image: z.string().url().describe("A URL for a high-quality image of the phone."),
   specs: z.object({
     announced: z.string().describe("The announcement date of the phone."),
     displaySize: z.string().describe("The size of the display in inches."),
@@ -44,7 +44,6 @@ const FindPhoneSpecsOutputSchema = z.object({
     batteryCharging: z.string().describe("The charging specifications (wired, wireless, reverse wireless)."),
     price: z.string().describe("The approximate launch price in USD, formatted like '$999'."),
   }),
-  reviews: z.array(z.string()).describe("An array of 5 diverse, one-sentence customer review highlights, covering both pros and cons. These should be realistic but generated."),
 });
 export type FindPhoneSpecsOutput = z.infer<typeof FindPhoneSpecsOutputSchema>;
 
@@ -62,9 +61,7 @@ const prompt = ai.definePrompt({
   
   If the query is ambiguous (e.g., "latest samsung phone"), use the latest high-end model from that brand (e.g., the latest Galaxy S Ultra).
   
-  Always provide a placeholder image from placehold.co.
-  
-  Generate 5 realistic, one-sentence review highlights.`,
+  For the image, provide a URL to a real, high-quality image of the phone. Do not use a placeholder.`,
 });
 
 const findPhoneSpecsFlow = ai.defineFlow(

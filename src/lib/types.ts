@@ -49,7 +49,6 @@ export type Phone = {
   model: string;
   image: string;
   specs: Spec;
-  reviews: string[];
 };
 
 export const specLabels: Record<keyof Spec, string> = {

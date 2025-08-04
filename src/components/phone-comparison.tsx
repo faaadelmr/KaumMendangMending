@@ -6,7 +6,6 @@ import { specLabels } from '@/lib/types';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Trophy, X } from 'lucide-react';
-import ReviewSummary from './review-summary';
 import Image from 'next/image';
 import { Button } from './ui/button';
 
@@ -117,12 +116,6 @@ export default function PhoneComparison({ phones, onRemovePhone }: PhoneComparis
     );
   }
 
-  const gridColsClass = 
-    phones.length === 1 ? 'md:grid-cols-1' :
-    phones.length === 2 ? 'md:grid-cols-2' :
-    phones.length === 3 ? 'lg:grid-cols-3' :
-    'lg:grid-cols-2 xl:grid-cols-4';
-
   return (
     <div className="space-y-8">
       <Card>
@@ -137,6 +130,15 @@ export default function PhoneComparison({ phones, onRemovePhone }: PhoneComparis
                 <TableHead className="w-[180px] font-headline text-lg text-primary-foreground/90">Feature</TableHead>
                 {phones.map(phone => (
                   <TableHead key={phone.id} className="text-center font-headline text-lg text-primary-foreground/90 relative group">
+                     <div className="aspect-square relative w-full overflow-hidden rounded-md bg-muted mb-4">
+                      <Image
+                        src={phone.image}
+                        alt={phone.model}
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="object-cover"
+                      />
+                    </div>
                     <div className="flex items-center justify-center gap-1">
                       <span>{phone.model}</span>
                       <Button variant="ghost" size="icon" className="size-6 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => onRemovePhone(phone.id)}>
@@ -178,34 +180,6 @@ export default function PhoneComparison({ phones, onRemovePhone }: PhoneComparis
               })}
             </TableBody>
           </Table>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-headline text-3xl">Review Rumble</CardTitle>
-          <CardDescription className="font-body">Here's what the crowd is saying, summarized by our AI expert.</CardDescription>
-        </CardHeader>
-        <CardContent className={`grid gap-6 grid-cols-1 ${gridColsClass}`}>
-          {phones.map(phone => (
-            <Card key={phone.id} className="bg-background flex flex-col">
-              <CardHeader>
-                <CardTitle className="font-headline text-center">{phone.model}</CardTitle>
-              </CardHeader>
-              <CardContent className="flex-grow">
-                 <div className="aspect-square relative w-full overflow-hidden rounded-md bg-muted mb-4">
-                  <Image
-                    src={phone.image}
-                    alt={phone.model}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    className="object-cover"
-                  />
-                </div>
-                <ReviewSummary phoneModel={phone.model} reviews={phone.reviews} />
-              </CardContent>
-            </Card>
-          ))}
         </CardContent>
       </Card>
     </div>

@@ -61,7 +61,7 @@ export default function Home() {
       </header>
       
       <section className="max-w-xl mx-auto">
-        <h2 className="text-3xl md:text-4xl font-headline font-semibold mb-6 text-center">Add a Contender</h2>
+        <h2 className="text-3xl md:text-4xl font-headline font-semibold mb-6 text-center">Add Your Fighter</h2>
         <div className="flex items-center gap-2">
           <Input 
             type="text"
