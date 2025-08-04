@@ -1,18 +1,23 @@
+
 "use client";
 
-import type { Phone, Spec } from '@/data/phones';
-import { specLabels } from '@/data/phones';
+import type { Phone, Spec } from '@/lib/types';
+import { specLabels } from '@/lib/types';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Trophy } from 'lucide-react';
+import { Trophy, X } from 'lucide-react';
 import ReviewSummary from './review-summary';
+import Image from 'next/image';
+import { Button } from './ui/button';
 
 interface PhoneComparisonProps {
   phones: Phone[];
+  onRemovePhone: (phoneId: number) => void;
 }
 
 // Helper to extract a number from a spec string (e.g., "5050 mAh" -> 5050)
 const getNumericValue = (spec: string): number => {
+  if (!spec) return 0;
   const match = spec.replace(/[^0-9.]/g, '');
   return match ? parseFloat(match) : 0;
 };
@@ -46,7 +51,7 @@ const getBestSpec = (specKey: keyof Spec, phones: Phone[]): string | null => {
     if (currentNumeric === 0 && bestNumeric === 0) continue; // Skip non-numeric specs
 
     if (isPrice) {
-      if (currentNumeric < bestNumeric) {
+      if (currentNumeric < bestNumeric && currentNumeric > 0) {
         bestPhone = phones[i];
       }
     } else {
@@ -58,24 +63,25 @@ const getBestSpec = (specKey: keyof Spec, phones: Phone[]): string | null => {
 
   // Check if there is a clear winner (no ties)
   let bestValue = bestPhone.specs[specKey];
+  let bestNumericValue: number;
   if (specKey === 'batteryType') {
-    bestValue = getNumericValue(bestValue).toString();
+    bestNumericValue = getNumericValue(bestValue);
   } else {
-    bestValue = getNumericValue(bestValue).toString();
+    bestNumericValue = getNumericValue(bestValue);
   }
-  
-  if (bestValue === '0' && specKey !== 'price') return null; // No winner for non-numeric specs
+
+  if (bestNumericValue === 0 && specKey !== 'price') return null; // No winner for non-numeric specs
 
   const isTie = phones.some(p => {
     let pValue = p.specs[specKey];
-    if (specKey === 'batteryType') {
-        pValue = getNumericValue(pValue).toString();
+    let pNumericValue: number;
+     if (specKey === 'batteryType') {
+        pNumericValue = getNumericValue(pValue);
     } else {
-        pValue = getNumericValue(pValue).toString();
+        pNumericValue = getNumericValue(pValue);
     }
-    return p.id !== bestPhone.id && pValue === bestValue;
+    return p.id !== bestPhone.id && pNumericValue === bestNumericValue;
   });
-
 
   return isTie ? null : bestPhone.specs[specKey];
 };
@@ -101,12 +107,12 @@ const specStructure: SpecGroup[] = [
 ];
 
 
-export default function PhoneComparison({ phones }: PhoneComparisonProps) {
+export default function PhoneComparison({ phones, onRemovePhone }: PhoneComparisonProps) {
   if (phones.length === 0) {
     return (
       <div className="text-center py-16 rounded-lg border-2 border-dashed">
         <h3 className="font-headline text-2xl">The Stage is Set...</h3>
-        <p className="text-muted-foreground font-body">Select at least one phone to see its stats.</p>
+        <p className="text-muted-foreground font-body">Add a phone to begin the battle!</p>
       </div>
     );
   }
@@ -130,8 +136,13 @@ export default function PhoneComparison({ phones }: PhoneComparisonProps) {
               <TableRow>
                 <TableHead className="w-[180px] font-headline text-lg text-primary-foreground/90">Feature</TableHead>
                 {phones.map(phone => (
-                  <TableHead key={phone.id} className="text-center font-headline text-lg text-primary-foreground/90">
-                    {phone.model}
+                  <TableHead key={phone.id} className="text-center font-headline text-lg text-primary-foreground/90 relative group">
+                    <div className="flex items-center justify-center gap-1">
+                      <span>{phone.model}</span>
+                      <Button variant="ghost" size="icon" className="size-6 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => onRemovePhone(phone.id)}>
+                        <X className="size-4"/>
+                      </Button>
+                    </div>
                   </TableHead>
                 ))}
               </TableRow>
@@ -147,8 +158,8 @@ export default function PhoneComparison({ phones }: PhoneComparisonProps) {
                       return (
                         <TableCell key={phone.id} className={`text-center transition-all text-xs ${isBest ? 'bg-accent/10' : ''}`}>
                           <div className={`inline-block p-2 rounded-md w-full text-left ${isBest ? 'bg-accent text-accent-foreground shadow-lg' : ''}`}>
-                            <div className="flex items-center justify-center gap-2 font-body text-base">
-                              {isBest && <Trophy className="w-4 h-4 shrink-0" />}
+                            <div className="flex items-start justify-center gap-2 font-body text-base">
+                              {isBest && <Trophy className="w-4 h-4 shrink-0 mt-1" />}
                               <div className='w-full'>
                                 {group.keys.map(key => (
                                     <p key={key} className="text-sm">
@@ -182,6 +193,15 @@ export default function PhoneComparison({ phones }: PhoneComparisonProps) {
                 <CardTitle className="font-headline text-center">{phone.model}</CardTitle>
               </CardHeader>
               <CardContent className="flex-grow">
+                 <div className="aspect-square relative w-full overflow-hidden rounded-md bg-muted mb-4">
+                  <Image
+                    src={phone.image}
+                    alt={phone.model}
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    className="object-cover"
+                  />
+                </div>
                 <ReviewSummary phoneModel={phone.model} reviews={phone.reviews} />
               </CardContent>
             </Card>

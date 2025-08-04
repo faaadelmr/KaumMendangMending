@@ -1,32 +1,53 @@
+
 "use client";
 
 import { useState } from 'react';
-import type { Phone } from '@/data/phones';
-import { phones as allPhones } from '@/data/phones';
-import PhoneSelector from '@/components/phone-selector';
+import type { Phone } from '@/lib/types';
 import PhoneComparison from '@/components/phone-comparison';
 import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { findPhoneSpecs } from '@/ai/flows/find-phone-specs';
+import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from 'lucide-react';
 
 export default function Home() {
-  const [selectedPhoneIds, setSelectedPhoneIds] = useState<number[]>([]);
+  const [phones, setPhones] = useState<Phone[]>([]);
+  const [phoneName, setPhoneName] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
-  const handlePhoneSelectionChange = (phoneId: number, isSelected: boolean) => {
-    setSelectedPhoneIds(prevIds => {
-      // Limit selection to 4 phones for optimal comparison view
-      if (isSelected && prevIds.length >= 4) {
-        // Here you could show a toast notification
-        console.log("You can only select up to 4 phones.");
-        return prevIds;
-      }
-      if (isSelected) {
-        return [...prevIds, phoneId];
-      } else {
-        return prevIds.filter(id => id !== phoneId);
-      }
-    });
+  const handleAddPhone = async () => {
+    if (!phoneName.trim()) return;
+    if (phones.length >= 4) {
+      toast({
+        variant: "destructive",
+        title: "Limit Reached",
+        description: "You can only compare up to 4 phones.",
+      });
+      return;
+    }
+    setLoading(true);
+    try {
+      const newPhone = await findPhoneSpecs({ query: phoneName });
+      // The AI doesn't return an ID, so we add one.
+      setPhones(prevPhones => [...prevPhones, { ...newPhone, id: Date.now() }]);
+      setPhoneName('');
+    } catch (e) {
+      toast({
+        variant: "destructive",
+        title: "AI Error",
+        description: `Could not find specs for "${phoneName}". Please try a different name.`,
+      });
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const selectedPhones = allPhones.filter(phone => selectedPhoneIds.includes(phone.id));
+  const handleRemovePhone = (phoneId: number) => {
+    setPhones(prevPhones => prevPhones.filter(p => p.id !== phoneId));
+  }
 
   return (
     <main className="container mx-auto px-4 py-8 md:py-12">
@@ -35,26 +56,35 @@ export default function Home() {
           Battle Phone Party
         </h1>
         <p className="mt-4 text-lg md:text-xl text-muted-foreground font-body max-w-2xl mx-auto">
-          Choose your contenders! Select up to 4 phones to see a side-by-side spec showdown and find your next champion.
+          Add up to 4 phones by name to see a side-by-side spec showdown and an AI-powered review summary.
         </p>
       </header>
       
-      <section>
-        <h2 className="text-3xl md:text-4xl font-headline font-semibold mb-6 text-center">Select Your Fighters</h2>
-        <PhoneSelector
-          phones={allPhones}
-          selectedPhoneIds={selectedPhoneIds}
-          onPhoneSelectionChange={handlePhoneSelectionChange}
-          selectionLimitReached={selectedPhoneIds.length >= 4}
-        />
+      <section className="max-w-xl mx-auto">
+        <h2 className="text-3xl md:text-4xl font-headline font-semibold mb-6 text-center">Add a Contender</h2>
+        <div className="flex items-center gap-2">
+          <Input 
+            type="text"
+            value={phoneName}
+            onChange={(e) => setPhoneName(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && !loading && handleAddPhone()}
+            placeholder="e.g., 'Pixel 8 Pro' or 'Latest iPhone'"
+            className="flex-grow"
+            disabled={loading || phones.length >= 4}
+          />
+          <Button onClick={handleAddPhone} disabled={loading || phones.length >= 4 || !phoneName.trim()}>
+            {loading ? <Loader2 className="animate-spin" /> : 'Add Phone'}
+          </Button>
+        </div>
+        {phones.length >= 4 && <p className="text-sm text-center text-muted-foreground mt-2">Selection limit reached.</p>}
       </section>
       
-      {selectedPhones.length > 0 && (
+      {phones.length > 0 && (
         <>
           <Separator className="my-12 md:my-16 bg-primary/20 h-0.5" />
           <section>
             <h2 className="text-3xl md:text-4xl font-headline font-semibold mb-6 text-center">The Arena</h2>
-            <PhoneComparison phones={selectedPhones} />
+            <PhoneComparison phones={phones} onRemovePhone={handleRemovePhone} />
           </section>
         </>
       )}
