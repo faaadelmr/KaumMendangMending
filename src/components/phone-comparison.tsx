@@ -30,6 +30,11 @@ const getComparableValue = (spec: string): number => {
     if (resolutionMatch) {
       return parseInt(resolutionMatch[1], 10) * parseInt(resolutionMatch[2], 10);
     }
+    // For camera modules like "50 MP", just get the number
+    const mpMatch = spec.match(/(\d+)\s*MP/i);
+    if (mpMatch) {
+      return parseInt(mpMatch[1], 10);
+    }
     const numericMatch = spec.match(/\d+/g);
     if (numericMatch) {
       // Find the largest number in the string (e.g., "Gorilla Glass Victus 2" -> 2)
@@ -115,13 +120,21 @@ export default function PhoneComparison({ phones, onRemovePhone }: PhoneComparis
   }
 
   // Pre-calculate all winners to avoid recalculating in the loop
-  const winners = {
+  const winners: Partial<Record<keyof Spec, string | null>> = {
+    // Standalone Specs
     price: getBestSpec('price', phones, false),
     announced: getBestSpec('announced', phones),
     storageRam: getBestSpec('storageRam', phones),
     sensors: getBestSpec('sensors', phones),
+
+    // Grouped Specs for comparison
     displayResolution: getBestSpec('displayResolution', phones),
     displayProtection: getBestSpec('displayProtection', phones),
+    mainCameraModules: getBestSpec('mainCameraModules', phones),
+    selfieCameraModules: getBestSpec('selfieCameraModules', phones),
+    batteryType: getBestSpec('batteryType', phones),
+    batteryCharging: getBestSpec('batteryCharging', phones),
+    ipRating: getBestSpec('ipRating', phones),
   };
 
   return (
@@ -169,14 +182,14 @@ export default function PhoneComparison({ phones, onRemovePhone }: PhoneComparis
                               {isBestInRow && <Trophy className="w-4 h-4 shrink-0 mt-1" />}
                               <div className='w-full'>
                                 {group.keys.map(key => {
-                                  const isBestInGroup = group.isCompact && winners[key as keyof typeof winners] === phone.specs[key];
+                                  const isBestInGroup = group.isCompact && winners[key] === phone.specs[key];
                                   return (
-                                    <p key={key} className={`text-sm flex items-center gap-1 ${isBestInGroup ? 'font-bold' : ''}`}>
-                                      {isBestInGroup && <Trophy className="w-3 h-3 text-accent" />}
+                                    <p key={key} className={`text-sm flex items-center justify-between gap-1 ${isBestInGroup ? 'font-bold' : ''}`}>
                                       <span>
                                         {group.isCompact && <span className="font-semibold">{specLabels[key]}: </span>}
                                         {phone.specs[key]}
                                       </span>
+                                      {isBestInGroup && <Trophy className="w-3 h-3 text-accent shrink-0" />}
                                     </p>
                                   );
                                 })}
