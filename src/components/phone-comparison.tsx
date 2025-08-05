@@ -20,20 +20,19 @@ interface PhoneComparisonProps {
 type SpecGroup = {
     label: string;
     keys: (keyof Spec)[];
-    isCompact: boolean;
 };
 
 const specStructure: SpecGroup[] = [
-    { label: specLabels.price, keys: ['price'], isCompact: false },
-    { label: specLabels.announced, keys: ['announced'], isCompact: false },
-    { label: "Display", keys: ['displaySize', 'displayResolution', 'displayProtection'], isCompact: true },
-    { label: "Platform", keys: ['os', 'osUpdate', 'processorChipset', 'processorCpu', 'processorGpu'], isCompact: true },
-    { label: specLabels.storageRam, keys: ['storageRam'], isCompact: false },
-    { label: "Main Camera", keys: ['mainCameraModules', 'mainCameraFeatures', 'mainCameraVideo'], isCompact: true },
-    { label: "Selfie Camera", keys: ['selfieCameraModules', 'selfieCameraFeatures', 'selfieCameraVideo'], isCompact: true },
-    { label: "Comms", keys: ['nfc', 'ipRating', 'sim', 'usb'], isCompact: true },
-    { label: specLabels.sensors, keys: ['sensors'], isCompact: false },
-    { label: "Battery", keys: ['batteryType', 'batteryCharging'], isCompact: true },
+    { label: specLabels.price, keys: ['price'] },
+    { label: specLabels.announced, keys: ['announced'] },
+    { label: "Display", keys: ['displaySize', 'displayResolution', 'displayProtection'] },
+    { label: "Platform", keys: ['os', 'osUpdate', 'processorChipset', 'processorCpu', 'processorGpu'] },
+    { label: specLabels.storageRam, keys: ['storageRam'] },
+    { label: "Main Camera", keys: ['mainCameraModules', 'mainCameraFeatures', 'mainCameraVideo'] },
+    { label: "Selfie Camera", keys: ['selfieCameraModules', 'selfieCameraFeatures', 'selfieCameraVideo'] },
+    { label: "Comms", keys: ['nfc', 'ipRating', 'sim', 'usb'] },
+    { label: specLabels.sensors, keys: ['sensors'] },
+    { label: "Battery", keys: ['batteryType', 'batteryCharging'] },
 ];
 
 
@@ -77,7 +76,7 @@ export default function PhoneComparison({ phones, onRemovePhone }: PhoneComparis
       <Card>
         <CardHeader>
           <CardTitle className="font-headline text-3xl">Spec Showdown</CardTitle>
-          <CardDescription className="font-body">Side-by-side comparison. The best spec in each row gets an AI-powered trophy!</CardDescription>
+          <CardDescription className="font-body">Side-by-side comparison. A trophy marks the undisputed champion of a spec, while a highlight marks a tie for the best.</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
@@ -120,27 +119,35 @@ export default function PhoneComparison({ phones, onRemovePhone }: PhoneComparis
                 ))
               )}
               {!loading && specStructure.map((group, index) => {
+                const isCompact = group.keys.length > 1;
                 return (
                   <TableRow key={index}>
                     <TableCell className="font-bold font-body align-top">{group.label}</TableCell>
                     {phones.map(phone => {
-                      const isStandaloneWinner = !group.isCompact && phones.length > 1 && winners[group.keys[0]] === phone.model;
+                       const winningSpecKey = isCompact ? null : group.keys[0];
+                       const winnersForSpec = winningSpecKey ? winners[winningSpecKey] : [];
+                       const isWinner = winningSpecKey ? winnersForSpec?.includes(phone.model) : false;
+                       const isSoloWinner = isWinner && winnersForSpec?.length === 1;
+
                       return (
-                        <TableCell key={phone.id} className={`text-center transition-all text-xs ${isStandaloneWinner ? 'bg-accent/10' : ''}`}>
-                          <div className="inline-block p-2 rounded-md w-full text-left">
-                            <div className={`flex items-start justify-center gap-2 font-body text-base ${isStandaloneWinner ? 'bg-accent text-accent-foreground shadow-lg p-2 rounded-md' : ''}`}>
-                              {isStandaloneWinner && <Trophy className="w-4 h-4 shrink-0 mt-1" />}
-                              <div className='w-full'>
+                        <TableCell key={phone.id} className={`text-center align-top transition-all text-xs ${isWinner ? 'bg-accent/10' : ''}`}>
+                          <div className={`p-2 rounded-md w-full text-left ${isSoloWinner ? 'bg-accent text-accent-foreground shadow-lg' : ''}`}>
+                            <div className={`flex items-start justify-center gap-2 font-body text-base`}>
+                              {isSoloWinner && <Trophy className="w-4 h-4 shrink-0 mt-1" />}
+                              <div className='w-full space-y-1'>
                                 {group.keys.map(key => {
-                                  const isBest = phones.length > 1 && phone.model === winners[key];
+                                  const winnersForKey = winners[key] || [];
+                                  const isBest = winnersForKey.includes(phone.model);
+                                  const isSoloBest = isBest && winnersForKey.length === 1;
+
                                   return (
-                                    <p key={key} className={`text-sm flex items-center justify-between gap-1 p-1 rounded-md transition-colors ${isBest ? 'bg-accent/20' : ''}`}>
-                                      <span>
-                                        {group.isCompact && <span className="font-semibold">{specLabels[key]}: </span>}
+                                    <div key={key} className={`flex items-center justify-between gap-1 p-1 rounded-md transition-colors ${isBest ? 'bg-accent/20' : ''}`}>
+                                      <span className="text-sm text-left">
+                                        {isCompact && <span className="font-semibold">{specLabels[key]}: </span>}
                                         {phone.specs[key]}
                                       </span>
-                                      {isBest && <Trophy className="w-3 h-3 text-accent shrink-0" />}
-                                    </p>
+                                      {isSoloBest && <Trophy className="w-3 h-3 text-accent shrink-0" />}
+                                    </div>
                                   );
                                 })}
                               </div>
