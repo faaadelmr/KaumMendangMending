@@ -72,5 +72,6 @@ export const specLabels: Record<keyof Spec, string> = {
   sensors: "Sensors",
   batteryType: "Battery",
   batteryCharging: "Charging",
-  price: "Price",
+  price: "Price (IDR)",
 };
+

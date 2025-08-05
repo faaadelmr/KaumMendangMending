@@ -41,7 +41,7 @@ const FindPhoneSpecsOutputSchema = z.object({
     sensors: z.string().describe("The sensors included in the phone."),
     batteryType: z.string().describe("The battery type and capacity (e.g., 'Li-Ion 5050 mAh')."),
     batteryCharging: z.string().describe("The charging specifications (wired, wireless, reverse wireless)."),
-    price: z.string().describe("The approximate launch price in USD, formatted like '$999'."),
+    price: z.string().describe("The approximate launch price in the Indonesian marketplace, formatted in IDR like 'Rp 15.000.000'."),
   }),
 });
 export type FindPhoneSpecsOutput = z.infer<typeof FindPhoneSpecsOutputSchema>;
@@ -58,6 +58,8 @@ const prompt = ai.definePrompt({
   
   Provide a realistic but brief summary of specs.
   
+  IMPORTANT: Find the price from the Indonesian marketplace and format it in Indonesian Rupiah (IDR), for example: "Rp 15.000.000".
+
   If the query is ambiguous (e.g., "latest samsung phone"), use the latest high-end model from that brand (e.g., the latest Galaxy S Ultra).
   
   If the exact phone model is not found, please find the closest existing model and provide its specifications. In the 'model' field of your response, return the name of the model you actually found.`,
@@ -74,3 +76,4 @@ const findPhoneSpecsFlow = ai.defineFlow(
     return output!;
   }
 );
+

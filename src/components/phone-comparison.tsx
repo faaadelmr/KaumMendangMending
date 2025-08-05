@@ -14,10 +14,10 @@ interface PhoneComparisonProps {
   onRemovePhone: (phoneId: number) => void;
 }
 
-// Helper to extract a number from a spec string (e.g., "5050 mAh" -> 5050)
+// Helper to extract a number from a spec string (e.g., "Rp 15.000.000" -> 15000000)
 const getNumericValue = (spec: string): number => {
   if (!spec) return 0;
-  const match = spec.replace(/[^0-9.]/g, '');
+  const match = spec.replace(/[^0-9]/g, ''); // Keep only numbers
   return match ? parseFloat(match) : 0;
 };
 
@@ -32,28 +32,19 @@ const getBestSpec = (specKey: keyof Spec, phones: Phone[]): string | null => {
   for (let i = 1; i < phones.length; i++) {
     const currentSpec = phones[i].specs[specKey];
     const bestSpec = bestPhone.specs[specKey];
-
-    // Handle special cases that are not simple numeric comparisons
-    if (specKey === 'batteryType') {
-        const currentNumeric = getNumericValue(currentSpec);
-        const bestNumeric = getNumericValue(bestSpec);
-        if (currentNumeric > bestNumeric) {
-            bestPhone = phones[i];
-        }
-        continue;
-    }
     
-    // Default numeric comparison
     const currentNumeric = getNumericValue(currentSpec);
     const bestNumeric = getNumericValue(bestSpec);
 
-    if (currentNumeric === 0 && bestNumeric === 0) continue; // Skip non-numeric specs
+    if (currentNumeric === 0 && bestNumeric === 0) continue; // Skip if values can't be parsed
 
     if (isPrice) {
-      if (currentNumeric < bestNumeric && currentNumeric > 0) {
+      // For price, a lower non-zero value is better
+      if (currentNumeric > 0 && (bestNumeric === 0 || currentNumeric < bestNumeric)) {
         bestPhone = phones[i];
       }
     } else {
+      // For other specs, a higher value is better
       if (currentNumeric > bestNumeric) {
         bestPhone = phones[i];
       }
@@ -62,27 +53,18 @@ const getBestSpec = (specKey: keyof Spec, phones: Phone[]): string | null => {
 
   // Check if there is a clear winner (no ties)
   let bestValue = bestPhone.specs[specKey];
-  let bestNumericValue: number;
-  if (specKey === 'batteryType') {
-    bestNumericValue = getNumericValue(bestValue);
-  } else {
-    bestNumericValue = getNumericValue(bestValue);
-  }
-
-  if (bestNumericValue === 0 && specKey !== 'price') return null; // No winner for non-numeric specs
+  let bestNumericValue = getNumericValue(bestValue);
+  
+  // No winner if the best value is 0 (except for price)
+  if (bestNumericValue === 0 && !isPrice) return null; 
 
   const isTie = phones.some(p => {
     let pValue = p.specs[specKey];
-    let pNumericValue: number;
-     if (specKey === 'batteryType') {
-        pNumericValue = getNumericValue(pValue);
-    } else {
-        pNumericValue = getNumericValue(pValue);
-    }
+    let pNumericValue = getNumericValue(pValue);
     return p.id !== bestPhone.id && pNumericValue === bestNumericValue;
   });
 
-  return isTie ? null : bestPhone.specs[specKey];
+  return isTie ? null : bestValue;
 };
 
 type SpecGroup = {
