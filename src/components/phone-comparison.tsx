@@ -80,8 +80,7 @@ const specStructure: SpecGroup[] = [
     { label: specLabels.storageRam, keys: ['storageRam'], isCompact: false },
     { label: "Main Camera", keys: ['mainCameraModules', 'mainCameraFeatures', 'mainCameraVideo'], isCompact: true },
     { label: "Selfie Camera", keys: ['selfieCameraModules', 'selfieCameraFeatures', 'selfieCameraVideo'], isCompact: true },
-    { label: specLabels.nfc, keys: ['nfc'], isCompact: false },
-    { label: specLabels.usb, keys: ['usb'], isCompact: false },
+    { label: "Comms", keys: ['nfc', 'ipRating', 'sim', 'usb'], isCompact: true },
     { label: specLabels.sensors, keys: ['sensors'], isCompact: false },
     { label: "Battery", keys: ['batteryType', 'batteryCharging'], isCompact: true },
     { label: specLabels.price, keys: ['price'], isCompact: false },
@@ -109,14 +108,20 @@ export default function PhoneComparison({ phones, onRemovePhone }: PhoneComparis
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[180px] font-headline text-lg text-primary-foreground/90">Feature</TableHead>
+                <TableHead className="w-[180px] font-headline text-lg text-primary-foreground/90 align-bottom">Feature</TableHead>
                 {phones.map(phone => (
-                  <TableHead key={phone.id} className="text-center font-headline text-lg text-primary-foreground/90 relative group">
-                    <div className="flex items-center justify-center gap-1">
-                      <span>{phone.model}</span>
-                      <Button variant="ghost" size="icon" className="size-6 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => onRemovePhone(phone.id)}>
-                        <X className="size-4"/>
-                      </Button>
+                  <TableHead key={phone.id} className="text-center font-headline text-lg text-primary-foreground/90 relative group align-bottom">
+                    <div className="flex flex-col items-center justify-end gap-1 min-h-[80px]">
+                      <div className="flex items-start gap-1">
+                        <span className="font-bold">{phone.model}</span>
+                        <Button variant="ghost" size="icon" className="size-6 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => onRemovePhone(phone.id)}>
+                          <X className="size-4"/>
+                        </Button>
+                      </div>
+                      <div className="text-sm font-body text-muted-foreground">
+                        <p>{phone.brand}</p>
+                        <p className="text-xs">{phone.specs.color}</p>
+                      </div>
                     </div>
                   </TableHead>
                 ))}

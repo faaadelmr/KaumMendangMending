@@ -1,5 +1,9 @@
 
 export type Spec = {
+  // GENERAL
+  brand: string;
+  color: string;
+  
   // LAUNCH
   announced: string;
 
@@ -30,6 +34,8 @@ export type Spec = {
 
   // COMMS
   nfc: string;
+  ipRating: string;
+  sim: string;
   usb: string;
 
   // FEATURES
@@ -51,6 +57,8 @@ export type Phone = {
 };
 
 export const specLabels: Record<keyof Spec, string> = {
+  brand: "Brand",
+  color: "Color",
   announced: "Announced",
   displaySize: "Display Size",
   displayResolution: "Display Resolution",
@@ -68,10 +76,11 @@ export const specLabels: Record<keyof Spec, string> = {
   selfieCameraFeatures: "Selfie Camera Features",
   selfieCameraVideo: "Selfie Camera Video",
   nfc: "NFC",
+  ipRating: "IP Rating",
+  sim: "SIM",
   usb: "Charging Port",
   sensors: "Sensors",
   batteryType: "Battery",
   batteryCharging: "Charging",
   price: "Price (IDR)",
 };
-

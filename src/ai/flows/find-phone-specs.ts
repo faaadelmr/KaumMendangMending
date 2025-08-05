@@ -20,6 +20,8 @@ const FindPhoneSpecsOutputSchema = z.object({
   brand: z.string().describe("The brand name of the phone, e.g., 'Google', 'Apple'."),
   model: z.string().describe("The specific model name of the phone, e.g., 'Pixel 8 Pro', 'iPhone 15 Pro'."),
   specs: z.object({
+    brand: z.string().describe("The brand name of the phone."),
+    color: z.string().describe("The available colors for the phone."),
     announced: z.string().describe("The announcement date of the phone."),
     displaySize: z.string().describe("The size of the display in inches."),
     displayResolution: z.string().describe("The resolution of the display in pixels."),
@@ -37,6 +39,8 @@ const FindPhoneSpecsOutputSchema = z.object({
     selfieCameraFeatures: z.string().describe("The features of the selfie camera."),
     selfieCameraVideo: z.string().describe("The video recording capabilities of the selfie camera."),
     nfc: z.string().describe("Whether NFC is supported."),
+    ipRating: z.string().describe("The IP rating for dust and water resistance (e.g., 'IP68')."),
+    sim: z.string().describe("The SIM card configuration (e.g., 'Nano-SIM, eSIM')."),
     usb: z.string().describe("The type of USB port."),
     sensors: z.string().describe("The sensors included in the phone."),
     batteryType: z.string().describe("The battery type and capacity (e.g., 'Li-Ion 5050 mAh')."),
@@ -60,9 +64,13 @@ const prompt = ai.definePrompt({
   
   IMPORTANT: Find the price from the Indonesian marketplace and format it in Indonesian Rupiah (IDR), for example: "Rp 15.000.000".
 
-  If the query is ambiguous (e.g., "latest samsung phone"), use the latest high-end model from that brand (e.g., the latest Galaxy S Ultra).
+  If the query is ambiguous or the phone is not found (e.g., "latest samsung phone" or "galaxy s25 ultra"), use the closest available high-end model from that brand (e.g., the latest Galaxy S Ultra).
   
-  If the exact phone model is not found, please find the closest existing model and provide its specifications. In the 'model' field of your response, return the name of the model you actually found.`,
+  Ensure you also provide the brand, color, IP rating, and SIM details.
+  For the 'brand' field in 'specs', use the brand name of the phone.
+  For 'color', list the available colors.
+  For 'ipRating', provide the dust and water resistance rating.
+  For 'sim', detail the SIM card setup.`,
 });
 
 const findPhoneSpecsFlow = ai.defineFlow(
@@ -76,4 +84,3 @@ const findPhoneSpecsFlow = ai.defineFlow(
     return output!;
   }
 );
-
