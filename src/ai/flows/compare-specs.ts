@@ -16,9 +16,9 @@ import type { Phone } from '@/lib/types';
 // Dynamically create the output schema keys from specLabels
 const winnerSchema = z.object(
   Object.fromEntries(
-    Object.keys(specLabels).map(key => [key, z.string().optional().describe(`The model name of the phone that has the best spec for ${specLabels[key as keyof typeof specLabels]}. Null if no clear winner.`)])
+    Object.keys(specLabels).map(key => [key, z.string().nullable().describe(`The model name of the phone that has the best spec for ${specLabels[key as keyof typeof specLabels]}. 'N/A' if no clear winner or a tie.`)])
   )
-).describe('An object where each key is a spec ID and the value is the model name of the winning phone. If there is a tie or no clear winner, the value should be null.');
+).describe('An object where each key is a spec ID and the value is the model name of the winning phone. If there is a tie or no clear winner, the value should be \'N/A\'.');
 export type Winners = z.infer<typeof winnerSchema>;
 
 const CompareSpecsInputSchema = z.object({
@@ -40,14 +40,14 @@ const prompt = ai.definePrompt({
   output: {schema: winnerSchema},
   prompt: `You are a world-renowned phone specifications analyst. You will be given a JSON array of phone objects.
   
-Your task is to act as an expert and perform a comprehensive comparison to determine which phone is the best for each individual specification key.
-Your analysis should be nuanced. For example:
+Your task is to act as an expert and perform a comprehensive comparison to determine which phone is the best for **each individual specification key**.
+Your analysis must be nuanced. For example:
 - For 'price', lower is better.
 - For numeric specs like 'displaySize' or 'batteryType' (capacity), higher is generally better.
 - For complex, non-numeric specs like 'os', 'processorChipset', 'mainCameraModules', and 'selfieCameraModules', use your deep expert knowledge to determine the superior option. Don't just count megapixels or cores; consider the overall quality, performance, and user experience. For chipsets, analyze their architecture and real-world performance. For cameras, consider sensor quality, features, and video capabilities.
 - For specs like 'osUpdate', parse the string (e.g., "7 years") to find the numeric value for comparison.
 
-If there is a tie or if it's impossible to determine a clear winner for a specific spec, the value for that spec key should be null.
+**IMPORTANT**: For each spec, you must return the 'model' name of the winning phone. If there is a tie, if it's impossible to determine a clear winner, or if the comparison is not applicable, you **MUST** return 'N/A' for that spec key. Do not leave any key out.
 
 Here is the phone data:
 {{{json phones}}}

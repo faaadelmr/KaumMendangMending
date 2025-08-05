@@ -120,27 +120,26 @@ export default function PhoneComparison({ phones, onRemovePhone }: PhoneComparis
                 ))
               )}
               {!loading && specStructure.map((group, index) => {
-                 const bestInStandaloneRow = !group.isCompact ? winners[group.keys[0]] : null;
                 return (
                   <TableRow key={index}>
                     <TableCell className="font-bold font-body align-top">{group.label}</TableCell>
                     {phones.map(phone => {
-                      const isBestInStandaloneRow = phones.length > 1 && phone.model === bestInStandaloneRow;
+                      const isStandaloneWinner = !group.isCompact && phones.length > 1 && winners[group.keys[0]] === phone.model;
                       return (
-                        <TableCell key={phone.id} className={`text-center transition-all text-xs ${isBestInStandaloneRow ? 'bg-accent/10' : ''}`}>
-                          <div className={`inline-block p-2 rounded-md w-full text-left`}>
-                            <div className={`flex items-start justify-center gap-2 font-body text-base ${isBestInStandaloneRow ? 'bg-accent text-accent-foreground shadow-lg p-2 rounded-md' : ''}`}>
-                              {isBestInStandaloneRow && <Trophy className="w-4 h-4 shrink-0 mt-1" />}
+                        <TableCell key={phone.id} className={`text-center transition-all text-xs ${isStandaloneWinner ? 'bg-accent/10' : ''}`}>
+                          <div className="inline-block p-2 rounded-md w-full text-left">
+                            <div className={`flex items-start justify-center gap-2 font-body text-base ${isStandaloneWinner ? 'bg-accent text-accent-foreground shadow-lg p-2 rounded-md' : ''}`}>
+                              {isStandaloneWinner && <Trophy className="w-4 h-4 shrink-0 mt-1" />}
                               <div className='w-full'>
                                 {group.keys.map(key => {
-                                  const isBestInGroup = phones.length > 1 && phone.model === winners[key];
+                                  const isBest = phones.length > 1 && phone.model === winners[key];
                                   return (
-                                    <p key={key} className={`text-sm flex items-center justify-between gap-1 p-1 rounded-md transition-colors ${isBestInGroup ? 'bg-accent/20' : ''}`}>
+                                    <p key={key} className={`text-sm flex items-center justify-between gap-1 p-1 rounded-md transition-colors ${isBest ? 'bg-accent/20' : ''}`}>
                                       <span>
                                         {group.isCompact && <span className="font-semibold">{specLabels[key]}: </span>}
                                         {phone.specs[key]}
                                       </span>
-                                      {isBestInGroup && <Trophy className="w-3 h-3 text-accent shrink-0" />}
+                                      {isBest && <Trophy className="w-3 h-3 text-accent shrink-0" />}
                                     </p>
                                   );
                                 })}
