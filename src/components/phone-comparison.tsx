@@ -184,7 +184,7 @@ export default function PhoneComparison({ phones, onRemovePhone }: PhoneComparis
                                 {group.keys.map(key => {
                                   const isBestInGroup = group.isCompact && winners[key] === phone.specs[key];
                                   return (
-                                    <p key={key} className={`text-sm flex items-center justify-between gap-1 ${isBestInGroup ? 'font-bold' : ''}`}>
+                                    <p key={key} className={`text-sm flex items-center justify-between gap-1 p-1 rounded-md transition-colors ${isBestInGroup ? 'bg-accent/20' : ''}`}>
                                       <span>
                                         {group.isCompact && <span className="font-semibold">{specLabels[key]}: </span>}
                                         {phone.specs[key]}
