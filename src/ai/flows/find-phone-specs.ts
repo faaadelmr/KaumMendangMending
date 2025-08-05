@@ -58,7 +58,9 @@ const prompt = ai.definePrompt({
   
   Provide a realistic but brief summary of specs.
   
-  If the query is ambiguous (e.g., "latest samsung phone"), use the latest high-end model from that brand (e.g., the latest Galaxy S Ultra).`,
+  If the query is ambiguous (e.g., "latest samsung phone"), use the latest high-end model from that brand (e.g., the latest Galaxy S Ultra).
+  
+  If the exact phone model is not found, please find the closest existing model and provide its specifications. In the 'model' field of your response, return the name of the model you actually found.`,
 });
 
 const findPhoneSpecsFlow = ai.defineFlow(
