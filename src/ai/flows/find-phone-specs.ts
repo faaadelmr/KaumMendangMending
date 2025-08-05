@@ -5,7 +5,7 @@
  *
  * - findPhoneSpecs - A function that takes a phone name and returns its specifications.
  * - FindPhoneSpecsInput - The input type for the findPhoneSpecs function.
- * - FindPhoneSpecsOutput - The return type for the findPhoneSpecs function.
+ * - FindPhoneSpecsOutput - The return type for the findPhonespecs function.
  */
 
 import {ai} from '@/ai/genkit';
@@ -27,7 +27,7 @@ const FindPhoneSpecsOutputSchema = z.object({
     displayResolution: z.string().describe("The resolution of the display in pixels."),
     displayProtection: z.string().describe("The type of screen protection (e.g., 'Gorilla Glass Victus 2')."),
     os: z.string().describe("The operating system the phone runs on."),
-    osUpdate: z.string().describe("The promised duration of OS updates."),
+    osUpdate: z.string().describe("The promised duration of OS updates in years (e.g., '7 years')."),
     processorChipset: z.string().describe("The chipset model."),
     processorCpu: z.string().describe("The CPU details."),
     processorGpu: z.string().describe("The GPU details."),
@@ -43,7 +43,7 @@ const FindPhoneSpecsOutputSchema = z.object({
     sim: z.string().describe("The SIM card configuration (e.g., 'Nano-SIM, eSIM')."),
     usb: z.string().describe("The type of USB port."),
     sensors: z.string().describe("The sensors included in the phone."),
-    batteryType: z.string().describe("The battery type and capacity (e.g., 'Li-Ion 5050 mAh')."),
+    batteryType: z.string().describe("The battery type and capacity in mAh (e.g., 'Li-Ion 5050 mAh')."),
     batteryCharging: z.string().describe("The charging specifications (wired, wireless, reverse wireless)."),
     price: z.string().describe("The approximate launch price in the Indonesian marketplace, formatted in IDR like 'Rp 15.000.000'."),
   }),
@@ -60,17 +60,19 @@ const prompt = ai.definePrompt({
   output: {schema: FindPhoneSpecsOutputSchema},
   prompt: `You are a phone specifications expert. Find the full specifications for the following phone: {{query}}.
   
-  Provide a realistic but brief summary of specs.
+  Provide detailed and accurate specifications for every field.
   
   IMPORTANT: Find the price from the Indonesian marketplace and format it in Indonesian Rupiah (IDR), for example: "Rp 15.000.000".
 
   If the query is ambiguous or the phone is not found (e.g., "latest samsung phone" or "galaxy s25 ultra"), use the closest available high-end model from that brand (e.g., the latest Galaxy S Ultra).
   
-  Ensure you also provide the brand, color, IP rating, and SIM details.
-  For the 'brand' field in 'specs', use the brand name of the phone.
-  For 'color', list the available colors.
-  For 'ipRating', provide the dust and water resistance rating.
-  For 'sim', detail the SIM card setup.`,
+  Ensure you provide specific details for the following:
+  - 'osUpdate': The promised duration of OS updates, formatted like '7 years'.
+  - 'batteryType': The capacity in mAh, formatted like 'Li-Ion 5050 mAh'.
+  - 'brand': The brand name of the phone.
+  - 'color': The available colors.
+  - 'ipRating': The dust and water resistance rating.
+  - 'sim': The SIM card setup.`,
 });
 
 const findPhoneSpecsFlow = ai.defineFlow(
