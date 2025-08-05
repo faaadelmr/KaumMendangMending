@@ -1,93 +1,21 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { Phone, Spec } from '@/lib/types';
 import { specLabels } from '@/lib/types';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Trophy, X } from 'lucide-react';
 import { Button } from './ui/button';
+import { compareAllSpecs, type Winners } from '@/ai/flows/compare-specs';
+import { Skeleton } from '@/components/ui/skeleton';
+
 
 interface PhoneComparisonProps {
   phones: Phone[];
   onRemovePhone: (phoneId: number) => void;
 }
-
-// Helper to extract a number from a spec string (e.g., "Rp 15.000.000" -> 15000000)
-const getNumericValue = (spec: string): number => {
-  if (!spec) return 0;
-  // This more robust regex handles resolutions like "1440 x 3120" by taking the first number.
-  const match = spec.match(/(\d+(\.\d+)?)/);
-  return match ? parseFloat(match[0]) : 0;
-};
-
-// Helper to get a comparable value from spec, prioritizing numbers but falling back to string length.
-const getComparableValue = (spec: string): number => {
-    if (!spec) return 0;
-    // For resolution, we can multiply the dimensions
-    const resolutionMatch = spec.match(/(\d+)\s*x\s*(\d+)/);
-    if (resolutionMatch) {
-      return parseInt(resolutionMatch[1], 10) * parseInt(resolutionMatch[2], 10);
-    }
-    // For camera modules like "50 MP", just get the number
-    const mpMatch = spec.match(/(\d+)\s*MP/i);
-    if (mpMatch) {
-      return parseInt(mpMatch[1], 10);
-    }
-    const numericMatch = spec.match(/\d+/g);
-    if (numericMatch) {
-      // Find the largest number in the string (e.g., "Gorilla Glass Victus 2" -> 2)
-      return Math.max(...numericMatch.map(Number));
-    }
-    // Fallback for non-numeric specs like "Panda Glass"
-    return spec.length; 
-};
-
-
-// Helper to find the best spec among the selected phones
-const getBestSpec = (specKey: keyof Spec, phones: Phone[], higherIsBetter = true): string | null => {
-  if (phones.length < 2) return null;
-
-  let bestPhone = phones[0];
-
-  for (let i = 1; i < phones.length; i++) {
-    const currentSpec = phones[i].specs[specKey];
-    const bestSpec = bestPhone.specs[specKey];
-    
-    const currentNumeric = specKey === 'price' ? getNumericValue(currentSpec) : getComparableValue(currentSpec);
-    const bestNumeric = specKey === 'price' ? getNumericValue(bestSpec) : getComparableValue(bestSpec);
-
-    if (currentNumeric === 0 && bestNumeric === 0) continue; 
-
-    if (higherIsBetter) {
-      if (currentNumeric > bestNumeric) {
-        bestPhone = phones[i];
-      }
-    } else {
-      // Lower is better (for price)
-      if (currentNumeric > 0 && (bestNumeric === 0 || currentNumeric < bestNumeric)) {
-        bestPhone = phones[i];
-      }
-    }
-  }
-
-  // Check for ties
-  let bestValue = bestPhone.specs[specKey];
-  let bestNumericValue = specKey === 'price' ? getNumericValue(bestValue) : getComparableValue(bestValue);
-  
-  // No winner if the best value is 0 (except for price)
-  if (bestNumericValue === 0 && higherIsBetter) return null; 
-
-  const isTie = phones.some(p => {
-    let pValue = p.specs[specKey];
-    let pNumericValue = specKey === 'price' ? getNumericValue(pValue) : getComparableValue(pValue);
-    return p.id !== bestPhone.id && pNumericValue === bestNumericValue;
-  });
-
-  return isTie ? null : bestValue;
-};
-
 
 type SpecGroup = {
     label: string;
@@ -96,6 +24,7 @@ type SpecGroup = {
 };
 
 const specStructure: SpecGroup[] = [
+    { label: specLabels.price, keys: ['price'], isCompact: false },
     { label: specLabels.announced, keys: ['announced'], isCompact: false },
     { label: "Display", keys: ['displaySize', 'displayResolution', 'displayProtection'], isCompact: true },
     { label: "Platform", keys: ['os', 'osUpdate', 'processorChipset', 'processorCpu', 'processorGpu'], isCompact: true },
@@ -105,11 +34,35 @@ const specStructure: SpecGroup[] = [
     { label: "Comms", keys: ['nfc', 'ipRating', 'sim', 'usb'], isCompact: true },
     { label: specLabels.sensors, keys: ['sensors'], isCompact: false },
     { label: "Battery", keys: ['batteryType', 'batteryCharging'], isCompact: true },
-    { label: specLabels.price, keys: ['price'], isCompact: false },
 ];
 
 
 export default function PhoneComparison({ phones, onRemovePhone }: PhoneComparisonProps) {
+  const [winners, setWinners] = useState<Winners>({});
+  const [loading, setLoading] = useState(false);
+
+  const getWinners = useCallback(async () => {
+    if (phones.length < 2) {
+      setWinners({});
+      return;
+    }
+    setLoading(true);
+    try {
+      const result = await compareAllSpecs({ phones });
+      setWinners(result);
+    } catch (error) {
+      console.error("Failed to get AI comparison:", error);
+      // Handle error appropriately, maybe show a toast
+    } finally {
+      setLoading(false);
+    }
+  }, [phones]);
+
+  useEffect(() => {
+    getWinners();
+  }, [getWinners]);
+
+
   if (phones.length === 0) {
     return (
       <div className="text-center py-16 rounded-lg border-2 border-dashed">
@@ -119,30 +72,12 @@ export default function PhoneComparison({ phones, onRemovePhone }: PhoneComparis
     );
   }
 
-  // Pre-calculate all winners to avoid recalculating in the loop
-  const winners: Partial<Record<keyof Spec, string | null>> = {
-    // Standalone Specs
-    price: getBestSpec('price', phones, false),
-    announced: getBestSpec('announced', phones),
-    storageRam: getBestSpec('storageRam', phones),
-    sensors: getBestSpec('sensors', phones),
-
-    // Grouped Specs for comparison
-    displayResolution: getBestSpec('displayResolution', phones),
-    displayProtection: getBestSpec('displayProtection', phones),
-    mainCameraModules: getBestSpec('mainCameraModules', phones),
-    selfieCameraModules: getBestSpec('selfieCameraModules', phones),
-    batteryType: getBestSpec('batteryType', phones),
-    batteryCharging: getBestSpec('batteryCharging', phones),
-    ipRating: getBestSpec('ipRating', phones),
-  };
-
   return (
     <div className="space-y-8">
       <Card>
         <CardHeader>
           <CardTitle className="font-headline text-3xl">Spec Showdown</CardTitle>
-          <CardDescription className="font-body">Side-by-side comparison. The best spec in each row gets a trophy!</CardDescription>
+          <CardDescription className="font-body">Side-by-side comparison. The best spec in each row gets an AI-powered trophy!</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
@@ -168,21 +103,37 @@ export default function PhoneComparison({ phones, onRemovePhone }: PhoneComparis
               </TableRow>
             </TableHeader>
             <TableBody>
-              {specStructure.map((group, index) => {
-                const bestSpecValue = !group.isCompact ? winners[group.keys[0] as keyof typeof winners] : null;
+              {loading && phones.length > 1 && (
+                specStructure.map((group, index) => (
+                   <TableRow key={`skeleton-${index}`}>
+                     <TableCell className="font-bold font-body align-top">{group.label}</TableCell>
+                     {phones.map(phone => (
+                       <TableCell key={phone.id}>
+                         <div className="flex flex-col gap-2">
+                           {group.keys.map(key => (
+                              <Skeleton key={key} className="h-4 w-full" />
+                           ))}
+                         </div>
+                       </TableCell>
+                     ))}
+                   </TableRow>
+                ))
+              )}
+              {!loading && specStructure.map((group, index) => {
+                 const bestInStandaloneRow = !group.isCompact ? winners[group.keys[0]] : null;
                 return (
                   <TableRow key={index}>
                     <TableCell className="font-bold font-body align-top">{group.label}</TableCell>
                     {phones.map(phone => {
-                      const isBestInRow = !group.isCompact && phone.specs[group.keys[0]] === bestSpecValue;
+                      const isBestInStandaloneRow = phones.length > 1 && phone.model === bestInStandaloneRow;
                       return (
-                        <TableCell key={phone.id} className={`text-center transition-all text-xs ${isBestInRow ? 'bg-accent/10' : ''}`}>
+                        <TableCell key={phone.id} className={`text-center transition-all text-xs ${isBestInStandaloneRow ? 'bg-accent/10' : ''}`}>
                           <div className={`inline-block p-2 rounded-md w-full text-left`}>
-                            <div className={`flex items-start justify-center gap-2 font-body text-base ${isBestInRow ? 'bg-accent text-accent-foreground shadow-lg p-2 rounded-md' : ''}`}>
-                              {isBestInRow && <Trophy className="w-4 h-4 shrink-0 mt-1" />}
+                            <div className={`flex items-start justify-center gap-2 font-body text-base ${isBestInStandaloneRow ? 'bg-accent text-accent-foreground shadow-lg p-2 rounded-md' : ''}`}>
+                              {isBestInStandaloneRow && <Trophy className="w-4 h-4 shrink-0 mt-1" />}
                               <div className='w-full'>
                                 {group.keys.map(key => {
-                                  const isBestInGroup = group.isCompact && winners[key] === phone.specs[key];
+                                  const isBestInGroup = phones.length > 1 && phone.model === winners[key];
                                   return (
                                     <p key={key} className={`text-sm flex items-center justify-between gap-1 p-1 rounded-md transition-colors ${isBestInGroup ? 'bg-accent/20' : ''}`}>
                                       <span>
