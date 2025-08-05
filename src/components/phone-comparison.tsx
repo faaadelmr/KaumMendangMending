@@ -7,7 +7,6 @@ import { specLabels } from '@/lib/types';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Trophy, X } from 'lucide-react';
-import Image from 'next/image';
 import { Button } from './ui/button';
 
 interface PhoneComparisonProps {
@@ -108,8 +107,6 @@ const specStructure: SpecGroup[] = [
 
 
 export default function PhoneComparison({ phones, onRemovePhone }: PhoneComparisonProps) {
-  const [brokenImages, setBrokenImages] = useState<number[]>([]);
-
   if (phones.length === 0) {
     return (
       <div className="text-center py-16 rounded-lg border-2 border-dashed">
@@ -117,10 +114,6 @@ export default function PhoneComparison({ phones, onRemovePhone }: PhoneComparis
         <p className="text-muted-foreground font-body">Add a phone to begin the battle!</p>
       </div>
     );
-  }
-
-  const handleImageError = (phoneId: number) => {
-    setBrokenImages(prev => [...prev, phoneId]);
   }
 
   return (
@@ -137,18 +130,6 @@ export default function PhoneComparison({ phones, onRemovePhone }: PhoneComparis
                 <TableHead className="w-[180px] font-headline text-lg text-primary-foreground/90">Feature</TableHead>
                 {phones.map(phone => (
                   <TableHead key={phone.id} className="text-center font-headline text-lg text-primary-foreground/90 relative group">
-                     <div className="relative mx-auto w-32 h-48 md:w-40 md:h-56 overflow-hidden rounded-md bg-muted mb-4">
-                      {!brokenImages.includes(phone.id) && (
-                        <Image
-                          src={phone.image}
-                          alt={phone.model}
-                          fill
-                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                          className="object-cover"
-                          onError={() => handleImageError(phone.id)}
-                        />
-                      )}
-                    </div>
                     <div className="flex items-center justify-center gap-1">
                       <span>{phone.model}</span>
                       <Button variant="ghost" size="icon" className="size-6 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => onRemovePhone(phone.id)}>

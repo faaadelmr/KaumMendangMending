@@ -19,7 +19,6 @@ export type FindPhoneSpecsInput = z.infer<typeof FindPhoneSpecsInputSchema>;
 const FindPhoneSpecsOutputSchema = z.object({
   brand: z.string().describe("The brand name of the phone, e.g., 'Google', 'Apple'."),
   model: z.string().describe("The specific model name of the phone, e.g., 'Pixel 8 Pro', 'iPhone 15 Pro'."),
-  image: z.string().describe("A URL FROM WIKIPEDIA for a high-quality image of the phone."),
   specs: z.object({
     announced: z.string().describe("The announcement date of the phone."),
     displaySize: z.string().describe("The size of the display in inches."),
@@ -59,9 +58,7 @@ const prompt = ai.definePrompt({
   
   Provide a realistic but brief summary of specs.
   
-  If the query is ambiguous (e.g., "latest samsung phone"), use the latest high-end model from that brand (e.g., the latest Galaxy S Ultra).
-  
-  For the image, provide a URL to a real, high-quality image of the phone. Do not use a placeholder.`,
+  If the query is ambiguous (e.g., "latest samsung phone"), use the latest high-end model from that brand (e.g., the latest Galaxy S Ultra).`,
 });
 
 const findPhoneSpecsFlow = ai.defineFlow(

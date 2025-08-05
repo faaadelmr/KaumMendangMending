@@ -47,7 +47,6 @@ export type Phone = {
   id: number;
   brand: string;
   model: string;
-  image: string;
   specs: Spec;
 };
 
