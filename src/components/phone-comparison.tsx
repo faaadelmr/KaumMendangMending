@@ -130,7 +130,7 @@ export default function PhoneComparison({ phones, onRemovePhone }: PhoneComparis
                 <TableHead className="w-[180px] font-headline text-lg text-primary-foreground/90">Feature</TableHead>
                 {phones.map(phone => (
                   <TableHead key={phone.id} className="text-center font-headline text-lg text-primary-foreground/90 relative group">
-                     <div className="aspect-square relative w-full overflow-hidden rounded-md bg-muted mb-4">
+                     <div className="relative mx-auto w-32 h-48 md:w-40 md:h-56 overflow-hidden rounded-md bg-muted mb-4">
                       <Image
                         src={phone.image}
                         alt={phone.model}
