@@ -84,3 +84,57 @@ export const specLabels: Record<keyof Spec, string> = {
   batteryCharging: "Charging",
   price: "Price (IDR)",
 };
+
+// LAPTOP TYPES
+
+export type LaptopSpec = {
+  // GENERAL
+  price: string;
+  releaseYear: string;
+
+  // PERFORMANCE
+  processor: string;
+  graphics: string;
+  ram: string;
+  storage: string;
+
+  // DISPLAY
+  displaySize: string;
+  displayResolution: string;
+  displayPanelType: string;
+  displayRefreshRate: string;
+
+  // DESIGN & PORTABILITY
+  weight: string;
+  ports: string;
+  webcam: string;
+  
+  // BATTERY
+  batteryCapacity: string;
+  batteryLife: string;
+};
+
+export type Laptop = {
+  id: number;
+  brand: string;
+  model: string;
+  specs: LaptopSpec;
+}
+
+export const laptopSpecLabels: Record<keyof LaptopSpec, string> = {
+  price: "Price (IDR)",
+  releaseYear: "Release Year",
+  processor: "Processor",
+  graphics: "Graphics Card",
+  ram: "RAM",
+  storage: "Storage",
+  displaySize: "Display Size",
+  displayResolution: "Display Resolution",
+  displayPanelType: "Panel Type",
+  displayRefreshRate: "Refresh Rate",
+  weight: "Weight",
+  ports: "Ports",
+  webcam: "Webcam",
+  batteryCapacity: "Battery Capacity",
+  batteryLife: "Est. Battery Life",
+};
