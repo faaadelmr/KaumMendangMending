@@ -57,22 +57,12 @@ export default function LaptopComparison({ laptops, onRemoveLaptop }: LaptopComp
     getWinners();
   }, [getWinners]);
 
-
-  if (laptops.length === 0) {
-    return (
-      <div className="text-center py-16 rounded-lg border-2 border-dashed">
-        <h3 className="font-headline text-2xl">The Stage is Set...</h3>
-        <p className="text-muted-foreground font-body">Add a laptop to begin the battle!</p>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-8">
       <Card>
         <CardHeader>
           <CardTitle className="font-headline text-3xl">Spec Showdown</CardTitle>
-          <CardDescription className="font-body">Side-by-side comparison. A trophy marks the undisputed champion of a spec, while a highlight marks a tie for the best.</CardDescription>
+          <CardDescription className="font-body">Komparasi antar spek, jika unggul maka akan ada tropi, namun jika sama maka hanya akan menampilkan sorotan pada text.</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>

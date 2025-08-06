@@ -14,7 +14,7 @@ export default function LandingPage() {
             Kaum Mendang Mending
           </h1>
           <p className="mt-4 text-lg md:text-xl text-muted-foreground font-body max-w-3xl mx-auto">
-            Selamat datang, para pejuang teknologi! Di sini adalah arena bagi kalian yang gemar menimbang, membandingkan, dan mencari nilai terbaik dari setiap perangkat.
+            Selamat datang, para pejuang mendang-mending! Di sini adalah arena pertarungan ponsel dan laptop bagi kalian yang gemar menimbang, membandingkan, dan mencari suatu nilai terbaik dari teknologi yang belum tentu kalian beli!
           </p>
         </header>
 
@@ -26,11 +26,11 @@ export default function LandingPage() {
                 <span>Battle Phone</span>
               </CardTitle>
               <CardDescription className="font-body">
-                Bandingkan ponsel pintar dari berbagai merk dan temukan jawara yang sesuai dengan kebutuhan dan kantong Anda.
+              Bandingkan smartphone dari berbagai merk dan temukan jawara yang spek-nya bantu kamu makin jadi pintar nge-scroll.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button asChild size="lg" className="w-full">
+              <Button asChild size="lg" className="w-full hover:bg-primary hover:shadow-md hover:outline hover:outline-accent transition-shadow">
                 <Link href="/phone">Mulai Bandingkan Ponsel</Link>
               </Button>
             </CardContent>
@@ -39,15 +39,15 @@ export default function LandingPage() {
           <Card className="hover:shadow-lg transition-shadow">
             <CardHeader>
               <CardTitle className="flex items-center justify-center gap-3 font-headline text-3xl">
-                <Laptop className="size-8 text-primary" />
+                <Laptop className="size-8 text-accent" />
                 <span>Battle Laptop</span>
               </CardTitle>
               <CardDescription className="font-body">
-                Adu spesifikasi laptop secara mendalam, dari prosesor hingga kualitas layar, untuk menemukan mesin kerja terbaik.
+                Adu spesifikasi laptop lebih mendalam, dari prosesor hingga kualitas layar, untuk menemukan mesin nonton anime terbaik.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button asChild size="lg" className="w-full">
+              <Button asChild size="lg" className="w-full bg-accent hover:bg-accent hover:shadow-md hover:outline hover:outline-primary transition-shadow">
                 <Link href="/laptop">Mulai Bandingkan Laptop</Link>
               </Button>
             </CardContent>

@@ -19,11 +19,11 @@ export default function LaptopPage() {
 
   const handleAddLaptop = async () => {
     if (!laptopName.trim()) return;
-    if (laptops.length >= 4) {
+    if (laptops.length >= 3) {
       toast({
         variant: "destructive",
         title: "Limit Reached",
-        description: "You can only compare up to 4 laptops.",
+        description: "You can only compare up to 3 laptops.",
       });
       return;
     }
@@ -56,27 +56,28 @@ export default function LaptopPage() {
           Battle Laptop Party
         </h1>
         <p className="mt-4 text-lg md:text-xl text-muted-foreground font-body max-w-2xl mx-auto">
-          Add up to 4 laptops by name to see a side-by-side spec showdown.
+        Kamu bisa membandingkan hingga 3 smartphone, kenapa cuma 3? soalnya keterbatasan AI dalam membandingkannya.
+          <br /><span className="text-sm text-muted-foreground font-body">Noted: Kalau komspanarasi tidak berjalan dengan baik, hapus salah satu yang telah ditambahkan.</span>
         </p>
       </header>
       
       <section className="max-w-xl mx-auto">
-        <h2 className="text-3xl md:text-4xl font-headline font-semibold mb-6 text-center">Add Your Contender</h2>
+        <h2 className="text-3xl md:text-4xl font-headline font-semibold mb-6 text-center">Add Your Fighter</h2>
         <div className="flex items-center gap-2">
           <Input 
             type="text"
             value={laptopName}
             onChange={(e) => setLaptopName(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && !loading && handleAddLaptop()}
-            placeholder="e.g., 'Macbook Pro M3' or 'Latest Dell XPS'"
+            placeholder="e.g., 'MSI Claw 8 AI+', 'GPD Win 4 2025' or 'MSI Modern 14 Ryzen 4300U'"
             className="flex-grow"
-            disabled={loading || laptops.length >= 4}
+            disabled={loading || laptops.length >= 3}
           />
-          <Button onClick={handleAddLaptop} disabled={loading || laptops.length >= 4 || !laptopName.trim()}>
-            {loading ? <Loader2 className="animate-spin" /> : 'Add Laptop'}
+          <Button onClick={handleAddLaptop} disabled={loading || laptops.length >= 3 || !laptopName.trim()}>
+            {loading ? <Loader2 className="animate-spin" /> : 'Add Character'}
           </Button>
         </div>
-        {laptops.length >= 4 && <p className="text-sm text-center text-muted-foreground mt-2">Selection limit reached.</p>}
+        {laptops.length >= 3 && <p className="text-sm text-center text-muted-foreground mt-2">tidak dapat menambahkan lagi, hapus salah satu yang telah ditambahkan.</p>}
       </section>
       
       {laptops.length > 0 && (

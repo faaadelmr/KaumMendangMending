@@ -11,6 +11,7 @@ import { findPhoneSpecs } from '@/ai/flows/find-phone-specs';
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from 'lucide-react';
 
+
 export default function Home() {
   const [phones, setPhones] = useState<Phone[]>([]);
   const [phoneName, setPhoneName] = useState('');
@@ -19,11 +20,11 @@ export default function Home() {
 
   const handleAddPhone = async () => {
     if (!phoneName.trim()) return;
-    if (phones.length >= 4) {
+    if (phones.length >= 3) {
       toast({
         variant: "destructive",
         title: "Limit Reached",
-        description: "You can only compare up to 4 phones.",
+        description: "You can only compare up to 3 phones.",
       });
       return;
     }
@@ -56,7 +57,8 @@ export default function Home() {
           Battle Phone Party
         </h1>
         <p className="mt-4 text-lg md:text-xl text-muted-foreground font-body max-w-2xl mx-auto">
-          Add up to 4 phones by name to see a side-by-side spec showdown and an AI-powered review summary.
+          Kamu bisa membandingkan hingga 3 smartphone, kenapa cuma 3? soalnya keterbatasan AI dalam membandingkannya.
+          <br /><span className="text-sm text-muted-foreground font-body">Noted: Kalau komspanarasi tidak berjalan dengan baik, hapus salah satu yang telah ditambahkan.</span>
         </p>
       </header>
       
@@ -68,15 +70,15 @@ export default function Home() {
             value={phoneName}
             onChange={(e) => setPhoneName(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && !loading && handleAddPhone()}
-            placeholder="e.g., 'Pixel 8 Pro' or 'Latest iPhone'"
+            placeholder="e.g., 'Redmi Note 12' atau 'Latest Samsung'"
             className="flex-grow"
-            disabled={loading || phones.length >= 4}
+            disabled={loading || phones.length >= 3}
           />
-          <Button onClick={handleAddPhone} disabled={loading || phones.length >= 4 || !phoneName.trim()}>
-            {loading ? <Loader2 className="animate-spin" /> : 'Add Phone'}
+          <Button onClick={handleAddPhone} disabled={loading || phones.length >= 3 || !phoneName.trim()}>
+            {loading ? <Loader2 className="animate-spin" /> : 'Add Character'}
           </Button>
         </div>
-        {phones.length >= 4 && <p className="text-sm text-center text-muted-foreground mt-2">Selection limit reached.</p>}
+        {phones.length >= 3 && <p className="text-sm text-center text-muted-foreground mt-2">tidak dapat menambahkan lagi, hapus salah satu yang telah ditambahkan.</p>}
       </section>
       
       {phones.length > 0 && (
