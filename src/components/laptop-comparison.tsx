@@ -23,11 +23,12 @@ type SpecGroup = {
 };
 
 const specStructure: SpecGroup[] = [
-    { label: "General", keys: ['price', 'releaseYear'] },
+    { label: "General", keys: ['price', 'releaseYear', 'color'] },
     { label: "Performance", keys: ['processor', 'graphics', 'ram', 'storage'] },
-    { label: "Display", keys: ['displaySize', 'displayResolution', 'displayPanelType', 'displayRefreshRate'] },
-    { label: "Design & Portability", keys: ['weight', 'ports', 'webcam'] },
-    { label: "Battery", keys: ['batteryCapacity', 'batteryLife'] },
+    { label: "Display", keys: ['displaySize', 'displayResolution', 'aspectRatio', 'displayPanelType', 'sRgbCoverage', 'displayBrightness', 'displayRefreshRate', 'touchscreen'] },
+    { label: "Design & Portability", keys: ['weight', 'dimensions', 'material', 'ports', 'webcam', 'backlitKeyboard', 'fingerprintReader'] },
+    { label: "Portability & Features", keys: ['batteryCapacity', 'batteryLife', 'coolingSystem'] },
+    { label: "Benchmark", keys: ['geekbenchSingle', 'geekbenchMulti'] },
 ];
 
 

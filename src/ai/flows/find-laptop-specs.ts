@@ -22,19 +22,31 @@ const FindLaptopSpecsOutputSchema = z.object({
   specs: z.object({
     price: z.string().describe("The approximate launch price in the Indonesian marketplace, formatted in IDR like 'Rp 25.000.000'."),
     releaseYear: z.string().describe("The year the laptop model was released."),
+    color: z.string().describe("The available colors for the laptop, e.g., 'Silver, Space Gray'."),
     processor: z.string().describe("The full processor name, including generation and model, e.g., 'Intel Core Ultra 7 155H' or 'Apple M3 Pro'."),
     graphics: z.string().describe("The full graphics card name, including VRAM if available, e.g., 'NVIDIA GeForce RTX 4070 8GB' or 'Integrated Apple 18-core GPU'."),
     ram: z.string().describe("The amount and type of RAM, e.g., '16GB DDR5'."),
     storage: z.string().describe("The size and type of storage, e.g., '1TB NVMe SSD'."),
     displaySize: z.string().describe("The size of the display in inches, e.g., '15.6 inches'."),
     displayResolution: z.string().describe("The resolution of the display in pixels, e.g., '1920x1200'."),
+    aspectRatio: z.string().describe("The aspect ratio of the display, e.g., '16:10'."),
     displayPanelType: z.string().describe("The panel technology of the display, e.g., 'OLED', 'IPS', 'Mini-LED'."),
+    sRgbCoverage: z.string().describe("The sRGB coverage percentage of the display, e.g., '100% sRGB'."),
+    displayBrightness: z.string().describe("The peak brightness of the display in nits, e.g., '500 nits'."),
     displayRefreshRate: z.string().describe("The refresh rate of the display in Hz, e.g., '120Hz'."),
+    touchscreen: z.string().describe("Whether the display is a touchscreen, e.g., 'Yes' or 'No'."),
     weight: z.string().describe("The weight of the laptop in kg or grams, e.g., '1.8 kg'."),
+    dimensions: z.string().describe("The dimensions of the laptop (Width x Height x Thickness) in mm, e.g., '344mm x 230mm x 18mm'."),
     ports: z.string().describe("A summary of the available ports, e.g., '2x Thunderbolt 4, 1x USB-A, HDMI 2.1, SD Card Reader'."),
     webcam: z.string().describe("The resolution of the webcam, e.g., '1080p'."),
+    backlitKeyboard: z.string().describe("Whether the keyboard has a backlight, e.g., 'Yes' or 'No'."),
+    fingerprintReader: z.string().describe("Whether the laptop has a fingerprint reader, e.g., 'Yes, integrated in power button' or 'No'."),
+    material: z.string().describe("The primary material of the laptop's chassis, e.g., 'Aluminum', 'Magnesium Alloy', 'Polycarbonate'."),
+    coolingSystem: z.string().describe("A brief description of the cooling system, e.g., 'Dual fans with vapor chamber' or 'Single fan with heat pipes'."),
     batteryCapacity: z.string().describe("The capacity of the battery in Watt-hours (Wh), e.g., '86Wh'."),
     batteryLife: z.string().describe("The manufacturer's estimated battery life for a standard task like web browsing, e.g., 'Up to 10 hours'."),
+    geekbenchSingle: z.string().describe("The Geekbench 6 single-core score for the processor. Provide a score, e.g., '2800'."),
+    geekbenchMulti: z.string().describe("The Geekbench 6 multi-core score for the processor. Provide a score, e.g., '14500'."),
   }),
 });
 export type FindLaptopSpecsOutput = z.infer<typeof FindLaptopSpecsOutputSchema>;
@@ -50,6 +62,7 @@ const prompt = ai.definePrompt({
   prompt: `You are a laptop technical expert. Find the full, detailed specifications for the following laptop: {{query}}.
   
   Provide detailed and accurate specifications for every single field. Be very specific. For example, for 'processor', don't just say 'Intel i7', say 'Intel Core i7-13700H'.
+  For benchmark scores like Geekbench, provide just the number. For dimensions, provide it as W x H x T.
   
   IMPORTANT: Find the price from the Indonesian marketplace and format it in Indonesian Rupiah (IDR), for example: "Rp 25.000.000".
 

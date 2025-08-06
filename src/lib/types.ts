@@ -91,6 +91,7 @@ export type LaptopSpec = {
   // GENERAL
   price: string;
   releaseYear: string;
+  color: string;
 
   // PERFORMANCE
   processor: string;
@@ -101,17 +102,30 @@ export type LaptopSpec = {
   // DISPLAY
   displaySize: string;
   displayResolution: string;
+  aspectRatio: string;
   displayPanelType: string;
+  sRgbCoverage: string;
+  displayBrightness: string;
   displayRefreshRate: string;
+  touchscreen: string;
 
   // DESIGN & PORTABILITY
   weight: string;
+  dimensions: string; // W x H x T
+  material: string;
   ports: string;
   webcam: string;
+  backlitKeyboard: string;
+  fingerprintReader: string;
   
-  // BATTERY
+  // BATTERY & FEATURES
   batteryCapacity: string;
   batteryLife: string;
+  coolingSystem: string;
+
+  // BENCHMARKS
+  geekbenchSingle: string;
+  geekbenchMulti: string;
 };
 
 export type Laptop = {
@@ -124,17 +138,29 @@ export type Laptop = {
 export const laptopSpecLabels: Record<keyof LaptopSpec, string> = {
   price: "Price (IDR)",
   releaseYear: "Release Year",
+  color: "Color",
   processor: "Processor",
   graphics: "Graphics Card",
   ram: "RAM",
   storage: "Storage",
   displaySize: "Display Size",
   displayResolution: "Display Resolution",
+  aspectRatio: "Aspect Ratio",
   displayPanelType: "Panel Type",
+  sRgbCoverage: "sRGB Coverage",
+  displayBrightness: "Brightness",
   displayRefreshRate: "Refresh Rate",
+  touchscreen: "Touchscreen",
   weight: "Weight",
+  dimensions: "Size (WxHxT)",
+  material: "Material",
   ports: "Ports",
   webcam: "Webcam",
+  backlitKeyboard: "Backlit Keyboard",
+  fingerprintReader: "Fingerprint Reader",
   batteryCapacity: "Battery Capacity",
   batteryLife: "Est. Battery Life",
+  coolingSystem: "Cooling System",
+  geekbenchSingle: "Geekbench 6 (Single)",
+  geekbenchMulti: "Geekbench 6 (Multi)",
 };
