@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import type { Phone, Spec } from '@/lib/types';
 import { specLabels } from '@/lib/types';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -15,28 +15,29 @@ import { Skeleton } from '@/components/ui/skeleton';
 interface PhoneComparisonProps {
   phones: Phone[];
   onRemovePhone: (phoneId: number) => void;
+  model: string;
 }
 
 type SpecGroup = {
     label: string;
     keys: (keyof Spec)[];
+    isCompact?: boolean;
 };
 
 const specStructure: SpecGroup[] = [
-    { label: specLabels.price, keys: ['price'] },
-    { label: specLabels.announced, keys: ['announced'] },
-    { label: "Display", keys: ['displaySize', 'displayResolution', 'displayProtection'] },
-    { label: "Platform", keys: ['os', 'osUpdate', 'processorChipset', 'processorCpu', 'processorGpu'] },
-    { label: specLabels.storageRam, keys: ['storageRam'] },
-    { label: "Main Camera", keys: ['mainCameraModules', 'mainCameraFeatures', 'mainCameraVideo'] },
-    { label: "Selfie Camera", keys: ['selfieCameraModules', 'selfieCameraFeatures', 'selfieCameraVideo'] },
-    { label: "Comms", keys: ['nfc', 'ipRating', 'sim', 'usb'] },
-    { label: specLabels.sensors, keys: ['sensors'] },
-    { label: "Battery", keys: ['batteryType', 'batteryCharging'] },
+    { label: "General", keys: ['price', 'announced', 'sim'] },
+    { label: "Display", keys: ['displaySize', 'displayResolution', 'displayProtection', 'dimensions'], isCompact: true },
+    { label: "Platform", keys: ['os', 'osUpdate', 'processorChipset', 'processorCpu', 'processorGpu'], isCompact: true },
+    { label: "Storage", keys: ['storageRam', 'storageType', 'ramType'] },
+    { label: "Main Camera", keys: ['mainCameraModules', 'mainCameraFeatures', 'mainCameraVideo'], isCompact: true },
+    { label: "Selfie Camera", keys: ['selfieCameraModules', 'selfieCameraFeatures', 'selfieCameraVideo'], isCompact: true },
+    { label: "Comms & Features", keys: ['nfc', 'usb', 'sensors', 'ipRating', 'bluetooth'], isCompact: true },
+    { label: "Battery", keys: ['batteryType', 'batteryCharging'], isCompact: true },
+    { label: "Benchmark", keys: ['geekbenchSingle', 'geekbenchMulti', 'antutu', 'threeDMark'] },
 ];
 
 
-export default function PhoneComparison({ phones, onRemovePhone }: PhoneComparisonProps) {
+export default function PhoneComparison({ phones, onRemovePhone, model }: PhoneComparisonProps) {
   const [winners, setWinners] = useState<Winners>({});
   const [loading, setLoading] = useState(false);
 
@@ -47,7 +48,7 @@ export default function PhoneComparison({ phones, onRemovePhone }: PhoneComparis
     }
     setLoading(true);
     try {
-      const result = await compareAllSpecs({ phones });
+      const result = await compareAllSpecs({ phones, model });
       setWinners(result);
     } catch (error) {
       console.error("Failed to get AI comparison:", error);
@@ -55,11 +56,84 @@ export default function PhoneComparison({ phones, onRemovePhone }: PhoneComparis
     } finally {
       setLoading(false);
     }
-  }, [phones]);
+  }, [phones, model]);
 
   useEffect(() => {
     getWinners();
   }, [getWinners]);
+
+  const overallWinners = useMemo(() => {
+    if (loading || Object.keys(winners).length === 0 || phones.length < 2) {
+      return [];
+    }
+
+    const trophyCounts = new Map<string, number>();
+    // Initialize counts for all phones
+    phones.forEach(p => trophyCounts.set(p.model, 0));
+
+    // Count solo wins
+    for (const key in winners) {
+      const winnersForKey = winners[key as keyof Winners] || [];
+      if (winnersForKey.length === 1) {
+        const winnerModel = winnersForKey[0];
+        trophyCounts.set(winnerModel, (trophyCounts.get(winnerModel) || 0) + 1);
+      }
+    }
+
+    let maxTrophies = 0;
+    for (const count of trophyCounts.values()) {
+      if (count > maxTrophies) {
+        maxTrophies = count;
+      }
+    }
+
+    if (maxTrophies === 0) return [];
+
+    const champions: string[] = [];
+    for (const [modelName, count] of trophyCounts.entries()) {
+      if (count === maxTrophies) {
+        champions.push(modelName);
+      }
+    }
+    
+    // To prevent everyone being a winner if they all have 0 trophies.
+    const allTiedWithZero = champions.length === phones.length && maxTrophies === 0
+    return allTiedWithZero ? [] : champions;
+
+  }, [winners, loading, phones]);
+  
+  const renderSkeleton = () => (
+    specStructure.map((group, groupIndex) => (
+      <React.Fragment key={`skeleton-group-${groupIndex}`}>
+        <TableRow>
+          <TableCell colSpan={phones.length + 1} className="font-bold font-body text-lg p-2 bg-muted/50">{group.label}</TableCell>
+        </TableRow>
+        {group.isCompact ? (
+          <TableRow>
+            <TableCell className="font-bold font-body align-top">{group.label}</TableCell>
+            {phones.map(phone => (
+              <TableCell key={phone.id}>
+                <div className="flex flex-col gap-2">
+                  {group.keys.map(key => (
+                     <Skeleton key={key} className="h-4 w-full" />
+                  ))}
+                </div>
+              </TableCell>
+            ))}
+          </TableRow>
+        ) : group.keys.map(key => (
+          <TableRow key={`skeleton-row-${key}`}>
+            <TableCell className="font-bold font-body">{specLabels[key]}</TableCell>
+            {phones.map((phone) => (
+              <TableCell key={phone.id} className="text-center">
+                <Skeleton className="h-4 w-full" />
+              </TableCell>
+            ))}
+          </TableRow>
+        ))}
+      </React.Fragment>
+    ))
+  );
 
   return (
     <div className="space-y-8">
@@ -76,15 +150,16 @@ export default function PhoneComparison({ phones, onRemovePhone }: PhoneComparis
                 {phones.map(phone => (
                   <TableHead key={phone.id} className="text-center font-headline text-lg text-primary-foreground/90 relative group align-bottom">
                     <div className="flex flex-col items-center justify-end gap-1 min-h-[80px]">
-                      <div className="flex items-start gap-1">
+                      <div className="flex items-center justify-center gap-1">
+                        {overallWinners.includes(phone.model) && <Trophy className="size-6 text-amber-400" />}
                         <span className="font-bold">{phone.model}</span>
-                        <Button variant="ghost" size="icon" className="size-6 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => onRemovePhone(phone.id)}>
+                        <Button variant="ghost" size="icon" className="size-6 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity absolute top-0 right-0" onClick={() => onRemovePhone(phone.id)}>
                           <X className="size-4"/>
                         </Button>
                       </div>
-                      <div className="text-sm font-body text-muted-foreground">
+                      <div className="text-sm font-body text-muted-foreground text-center">
                         <p>{phone.brand}</p>
-                        <p className="text-xs">{phone.specs.color}</p>
+                        <p>{phone.specs.color}</p>
                       </div>
                     </div>
                   </TableHead>
@@ -92,63 +167,65 @@ export default function PhoneComparison({ phones, onRemovePhone }: PhoneComparis
               </TableRow>
             </TableHeader>
             <TableBody>
-              {loading && phones.length > 1 && (
-                specStructure.map((group, index) => (
-                   <TableRow key={`skeleton-${index}`}>
-                     <TableCell className="font-bold font-body align-top">{group.label}</TableCell>
-                     {phones.map(phone => (
-                       <TableCell key={phone.id}>
-                         <div className="flex flex-col gap-2">
-                           {group.keys.map(key => (
-                              <Skeleton key={key} className="h-4 w-full" />
-                           ))}
-                         </div>
-                       </TableCell>
-                     ))}
-                   </TableRow>
-                ))
-              )}
-              {!loading && specStructure.map((group, index) => {
-                const isCompact = group.keys.length > 1;
-                return (
-                  <TableRow key={index}>
-                    <TableCell className="font-bold font-body align-top">{group.label}</TableCell>
-                    {phones.map(phone => {
-                       const winningSpecKey = isCompact ? null : group.keys[0];
-                       const winnersForSpec = winningSpecKey ? winners[winningSpecKey] : [];
-                       const isWinner = winningSpecKey ? winnersForSpec?.includes(phone.model) : false;
-                       const isSoloWinner = isWinner && winnersForSpec?.length === 1;
+              {loading && phones.length > 1 ? renderSkeleton() : specStructure.map((group) => (
+                <React.Fragment key={group.label}>
+                  <TableRow>
+                    <TableCell colSpan={phones.length + 1} className="font-bold font-body text-lg p-2 bg-muted/50">{group.label}</TableCell>
+                  </TableRow>
+                  
+                  {group.isCompact ? (
+                    <TableRow>
+                      <TableCell className="font-bold font-body align-top pt-4">Details</TableCell>
+                      {phones.map(phone => (
+                        <TableCell key={phone.id} className="align-top">
+                          <div className='w-full space-y-1'>
+                            {group.keys.map(key => {
+                              const winnersForKey = winners[key] || [];
+                              const isBest = winnersForKey.includes(phone.model);
+                              const isSoloBest = isBest && winnersForKey.length === 1;
 
-                      return (
-                        <TableCell key={phone.id} className={`text-center align-top transition-all text-xs ${isWinner ? 'bg-accent/10' : ''}`}>
-                          <div className={`p-2 rounded-md w-full text-left ${isSoloWinner ? 'bg-accent text-accent-foreground shadow-lg' : ''}`}>
-                            <div className={`flex items-start justify-center gap-2 font-body text-base`}>
-                              {isSoloWinner && <Trophy className="w-4 h-4 shrink-0 mt-1" />}
-                              <div className='w-full space-y-1'>
-                                {group.keys.map(key => {
-                                  const winnersForKey = winners[key] || [];
-                                  const isBest = winnersForKey.includes(phone.model);
-                                  const isSoloBest = isBest && winnersForKey.length === 1;
-
-                                  return (
-                                    <div key={key} className={`flex items-center justify-between gap-1 p-1 rounded-md transition-colors ${isBest ? 'bg-accent/20' : ''}`}>
-                                      <span className="text-sm text-left">
-                                        {isCompact && <span className="font-semibold">{specLabels[key]}: </span>}
-                                        {phone.specs[key]}
-                                      </span>
-                                      {isSoloBest && <Trophy className="w-3 h-3 text-accent shrink-0" />}
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            </div>
+                              return (
+                                <div key={key} className={`flex items-center justify-between gap-1 p-1 rounded-md transition-colors ${isBest ? 'bg-accent/20' : ''}`}>
+                                  <span className="text-sm text-left">
+                                    <span className="font-semibold">{specLabels[key]}: </span>
+                                    {phone.specs[key]}
+                                  </span>
+                                  {isSoloBest && <Trophy className="w-3 h-3 text-accent shrink-0" />}
+                                </div>
+                              );
+                            })}
                           </div>
                         </TableCell>
+                      ))}
+                    </TableRow>
+                  ) : group.keys.map(key => {
+                      const winnersForKey = winners[key] || [];
+                      const isWinnerDeclared = winnersForKey.length > 0;
+                      const isSoloWinner = isWinnerDeclared && winnersForKey.length === 1;
+
+                      const hasValue = phones.some(p => p.specs[key]);
+                      if (!hasValue) return null;
+                      
+                      return (
+                          <TableRow key={key}>
+                              <TableCell className="font-bold font-body align-middle">{specLabels[key]}</TableCell>
+                              {phones.map(phone => {
+                                  const isBest = winnersForKey.includes(phone.model);
+                                  
+                                  return (
+                                      <TableCell key={phone.id} className={`text-center align-middle transition-all ${isBest ? 'bg-accent/10' : ''}`}>
+                                          <div className={`p-2 rounded-md w-full h-full flex items-center justify-center gap-2 ${isSoloWinner && isBest ? 'bg-accent text-accent-foreground shadow-lg' : ''}`}>
+                                              {isSoloWinner && isBest && <Trophy className="w-4 h-4 shrink-0" />}
+                                              <span className="text-sm">{phone.specs[key]}</span>
+                                          </div>
+                                      </TableCell>
+                                  );
+                              })}
+                          </TableRow>
                       );
-                    })}
-                  </TableRow>
-                );
-              })}
+                  })}
+                </React.Fragment>
+              ))}
             </TableBody>
           </Table>
         </CardContent>

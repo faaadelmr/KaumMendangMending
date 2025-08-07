@@ -13,6 +13,7 @@ import {z} from 'genkit';
 
 const FindLaptopSpecsInputSchema = z.object({
   query: z.string().describe('The name of the laptop to find specs for. Can be a general query like "latest Dell XPS 15".'),
+  model: z.string().optional().describe('The AI model to use for the lookup.'),
 });
 export type FindLaptopSpecsInput = z.infer<typeof FindLaptopSpecsInputSchema>;
 
@@ -47,6 +48,9 @@ const FindLaptopSpecsOutputSchema = z.object({
     batteryLife: z.string().describe("The manufacturer's estimated battery life for a standard task like web browsing, e.g., 'Up to 10 hours'."),
     geekbenchSingle: z.string().describe("The Geekbench 6 single-core score for the processor. Provide a score, e.g., '2800'."),
     geekbenchMulti: z.string().describe("The Geekbench 6 multi-core score for the processor. Provide a score, e.g., '14500'."),
+    cinebenchSingle: z.string().describe("The Cinebench single-core score for the processor. Include the version, e.g., '1800 (R23)'."),
+    cinebenchMulti: z.string().describe("The Cinebench multi-core score for the processor. Include the version, e.g., '18500 (R23)'."),
+    pcMark10: z.string().describe("The PCMark 10 score for overall system performance. Provide just the number, e.g., '6500'."),
   }),
 });
 export type FindLaptopSpecsOutput = z.infer<typeof FindLaptopSpecsOutputSchema>;
@@ -62,7 +66,7 @@ const prompt = ai.definePrompt({
   prompt: `You are a laptop technical expert. Find the full, detailed specifications for the following laptop: {{query}}.
   
   Provide detailed and accurate specifications for every single field. Be very specific. For example, for 'processor', don't just say 'Intel i7', say 'Intel Core i7-13700H'.
-  For benchmark scores like Geekbench, provide just the number. For dimensions, provide it as W x H x T.
+  For benchmark scores, provide just the number. For Cinebench, include the version used (e.g., R23). For dimensions, provide it as W x H x T.
   
   IMPORTANT: Find the price from the Indonesian marketplace and format it in Indonesian Rupiah (IDR), for example: "Rp 25.000.000".
 
@@ -77,7 +81,12 @@ const findLaptopSpecsFlow = ai.defineFlow(
     outputSchema: FindLaptopSpecsOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
+    const model = input.model ? `googleai/${input.model}` : undefined;
+    const {output} = await prompt(
+        { query: input.query },
+        { model: model as any }
+    );
     return output!;
   }
 );
+

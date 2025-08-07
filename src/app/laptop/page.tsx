@@ -10,34 +10,48 @@ import { Input } from '@/components/ui/input';
 import { findLaptopSpecs } from '@/ai/flows/find-laptop-specs';
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 export default function LaptopPage() {
   const [laptops, setLaptops] = useState<Laptop[]>([]);
   const [laptopName, setLaptopName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [model, setModel] = useState('gemini-2.5-flash-lite');
   const { toast } = useToast();
 
   const handleAddLaptop = async () => {
     if (!laptopName.trim()) return;
-    if (laptops.length >= 3) {
+
+    const queries = laptopName.split(/\s*vs\s*|\s*,\s*/i).map(q => q.trim()).filter(Boolean);
+    
+    if (laptops.length + queries.length > 3) {
       toast({
         variant: "destructive",
         title: "Limit Reached",
-        description: "You can only compare up to 3 laptops.",
+        description: `You can only compare up to 3 laptops in total. You are trying to add ${queries.length} more.`,
       });
       return;
     }
+
     setLoading(true);
     try {
-      const newLaptop = await findLaptopSpecs({ query: laptopName });
-      // The AI doesn't return an ID, so we add one.
-      setLaptops(prevLaptops => [...prevLaptops, { ...newLaptop, id: Date.now() }]);
+      const newLaptopsPromises = queries.map(query => findLaptopSpecs({ query, model }));
+      const newLaptopsResults = await Promise.all(newLaptopsPromises);
+      
+      const newLaptopsWithId = newLaptopsResults.map(laptop => ({
+        ...laptop,
+        id: Date.now() + Math.random(), // Add random number to avoid collision on fast adds
+      }));
+
+      setLaptops(prevLaptops => [...prevLaptops, ...newLaptopsWithId]);
       setLaptopName('');
     } catch (e) {
+      const failedQuery = e instanceof Error && (e as any).message?.match(/"(.*?)"/) ? (e as any).message.match(/"(.*?)"/)[1] : laptopName;
       toast({
         variant: "destructive",
         title: "AI Error",
-        description: `Could not find specs for "${laptopName}". Please try a different name.`,
+        description: `Could not find specs for "${failedQuery}". Please try a different name.`,
       });
       console.error(e);
     } finally {
@@ -69,7 +83,7 @@ export default function LaptopPage() {
             value={laptopName}
             onChange={(e) => setLaptopName(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && !loading && handleAddLaptop()}
-            placeholder="e.g., 'MSI Claw 8 AI+', 'GPD Win 4 2025' or 'MSI Modern 14 Ryzen 4300U'"
+            placeholder="e.g., 'Macbook Air M3' or 'Dell XPS 13, Surface Laptop 5'"
             className="flex-grow"
             disabled={loading || laptops.length >= 3}
           />
@@ -78,6 +92,24 @@ export default function LaptopPage() {
           </Button>
         </div>
         {laptops.length >= 3 && <p className="text-sm text-center text-muted-foreground mt-2">tidak dapat menambahkan lagi, hapus salah satu yang telah ditambahkan.</p>}
+
+        <div className="mt-4 flex justify-center">
+            <RadioGroup
+                value={model}
+                onValueChange={setModel}
+                className="flex items-center gap-4"
+                disabled={loading}
+            >
+                <Label htmlFor="fast-model" className="flex items-center gap-2 cursor-pointer">
+                    <RadioGroupItem value="gemini-2.5-flash-lite" id="fast-model" />
+                    <span>Cepat</span>
+                </Label>
+                <Label htmlFor="better-model" className="flex items-center gap-2 cursor-pointer">
+                    <RadioGroupItem value="gemini-2.5-flash" id="better-model" />
+                    <span>Lebih Baik</span>
+                </Label>
+            </RadioGroup>
+        </div>
       </section>
       
       {laptops.length > 0 && (
@@ -85,7 +117,7 @@ export default function LaptopPage() {
           <Separator className="my-12 md:my-16 bg-primary/20 h-0.5" />
           <section>
             <h2 className="text-3xl md:text-4xl font-headline font-semibold mb-6 text-center">The Arena</h2>
-            <LaptopComparison laptops={laptops} onRemoveLaptop={handleRemoveLaptop} />
+            <LaptopComparison laptops={laptops} onRemoveLaptop={handleRemoveLaptop} model={model} />
           </section>
         </>
       )}

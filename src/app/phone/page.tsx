@@ -10,41 +10,56 @@ import { Input } from '@/components/ui/input';
 import { findPhoneSpecs } from '@/ai/flows/find-phone-specs';
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 
 export default function Home() {
   const [phones, setPhones] = useState<Phone[]>([]);
   const [phoneName, setPhoneName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [model, setModel] = useState('gemini-2.5-flash-lite');
   const { toast } = useToast();
 
   const handleAddPhone = async () => {
     if (!phoneName.trim()) return;
-    if (phones.length >= 3) {
+
+    const queries = phoneName.split(/\s*vs\s*|\s*,\s*/i).map(q => q.trim()).filter(Boolean);
+
+    if (phones.length + queries.length > 3) {
       toast({
         variant: "destructive",
         title: "Limit Reached",
-        description: "You can only compare up to 3 phones.",
+        description: `You can only compare up to 3 phones in total. You are trying to add ${queries.length} more.`,
       });
       return;
     }
+
     setLoading(true);
     try {
-      const newPhone = await findPhoneSpecs({ query: phoneName });
-      // The AI doesn't return an ID, so we add one.
-      setPhones(prevPhones => [...prevPhones, { ...newPhone, id: Date.now() }]);
+      const newPhonesPromises = queries.map(query => findPhoneSpecs({ query, model }));
+      const newPhonesResults = await Promise.all(newPhonesPromises);
+
+      const newPhonesWithId = newPhonesResults.map(phone => ({
+        ...phone,
+        id: Date.now() + Math.random(), // Add random number to avoid collision on fast adds
+      }));
+
+      setPhones(prevPhones => [...prevPhones, ...newPhonesWithId]);
       setPhoneName('');
     } catch (e) {
+      const failedQuery = e instanceof Error && (e as any).message?.match(/"(.*?)"/) ? (e as any).message.match(/"(.*?)"/)[1] : phoneName;
       toast({
         variant: "destructive",
         title: "AI Error",
-        description: `Could not find specs for "${phoneName}". Please try a different name.`,
+        description: `Could not find specs for "${failedQuery}". Please try a different name.`,
       });
       console.error(e);
     } finally {
       setLoading(false);
     }
   };
+
 
   const handleRemovePhone = (phoneId: number) => {
     setPhones(prevPhones => prevPhones.filter(p => p.id !== phoneId));
@@ -70,7 +85,7 @@ export default function Home() {
             value={phoneName}
             onChange={(e) => setPhoneName(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && !loading && handleAddPhone()}
-            placeholder="e.g., 'Redmi Note 12' atau 'Latest Samsung'"
+            placeholder="e.g., 'Pixel 8' or 'iPhone 15, Galaxy S24'"
             className="flex-grow"
             disabled={loading || phones.length >= 3}
           />
@@ -79,6 +94,23 @@ export default function Home() {
           </Button>
         </div>
         {phones.length >= 3 && <p className="text-sm text-center text-muted-foreground mt-2">tidak dapat menambahkan lagi, hapus salah satu yang telah ditambahkan.</p>}
+        <div className="mt-4 flex justify-center">
+            <RadioGroup
+                value={model}
+                onValueChange={setModel}
+                className="flex items-center gap-4"
+                disabled={loading}
+            >
+                <Label htmlFor="fast-model" className="flex items-center gap-2 cursor-pointer">
+                    <RadioGroupItem value="gemini-2.5-flash-lite" id="fast-model" />
+                    <span>Cepat</span>
+                </Label>
+                <Label htmlFor="better-model" className="flex items-center gap-2 cursor-pointer">
+                    <RadioGroupItem value="gemini-2.5-flash" id="better-model" />
+                    <span>Lebih Baik</span>
+                </Label>
+            </RadioGroup>
+        </div>
       </section>
       
       {phones.length > 0 && (
@@ -86,7 +118,7 @@ export default function Home() {
           <Separator className="my-12 md:my-16 bg-primary/20 h-0.5" />
           <section>
             <h2 className="text-3xl md:text-4xl font-headline font-semibold mb-6 text-center">The Arena</h2>
-            <PhoneComparison phones={phones} onRemovePhone={handleRemovePhone} />
+            <PhoneComparison phones={phones} onRemovePhone={handleRemovePhone} model={model} />
           </section>
         </>
       )}

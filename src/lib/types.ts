@@ -3,6 +3,7 @@ export type Spec = {
   // GENERAL
   brand: string;
   color: string;
+  dimensions: string; // WxHxT
   
   // LAUNCH
   announced: string;
@@ -21,6 +22,8 @@ export type Spec = {
 
   // STORAGE
   storageRam: string;
+  storageType: string;
+  ramType: string;
 
   // MAIN CAMERA
   mainCameraModules: string;
@@ -37,6 +40,7 @@ export type Spec = {
   ipRating: string;
   sim: string;
   usb: string;
+  bluetooth: string;
 
   // FEATURES
   sensors: string;
@@ -47,6 +51,12 @@ export type Spec = {
 
   // MISC
   price: string;
+  
+  // BENCHMARKS
+  geekbenchSingle: string;
+  geekbenchMulti: string;
+  antutu: string;
+  threeDMark: string;
 };
 
 export type Phone = {
@@ -59,6 +69,7 @@ export type Phone = {
 export const specLabels: Record<keyof Spec, string> = {
   brand: "Brand",
   color: "Color",
+  dimensions: "Dimensions (WxHxT)",
   announced: "Announced",
   displaySize: "Size",
   displayResolution: "Resolution",
@@ -69,6 +80,8 @@ export const specLabels: Record<keyof Spec, string> = {
   processorCpu: "CPU",
   processorGpu: "GPU",
   storageRam: "Storage & RAM",
+  storageType: "Storage Type",
+  ramType: "RAM Type",
   mainCameraModules: "Modules",
   mainCameraFeatures: "Features",
   mainCameraVideo: "Video",
@@ -79,10 +92,15 @@ export const specLabels: Record<keyof Spec, string> = {
   ipRating: "IP Rating",
   sim: "SIM",
   usb: "Charging Port",
+  bluetooth: "Bluetooth",
   sensors: "Sensors",
   batteryType: "Battery",
   batteryCharging: "Charging",
   price: "Price (IDR)",
+  geekbenchSingle: "Geekbench 6 (Single)",
+  geekbenchMulti: "Geekbench 6 (Multi)",
+  antutu: "AnTuTu",
+  threeDMark: "3DMark (Wild Life)",
 };
 
 // LAPTOP TYPES
@@ -126,6 +144,9 @@ export type LaptopSpec = {
   // BENCHMARKS
   geekbenchSingle: string;
   geekbenchMulti: string;
+  cinebenchSingle: string;
+  cinebenchMulti: string;
+  pcMark10: string;
 };
 
 export type Laptop = {
@@ -163,4 +184,8 @@ export const laptopSpecLabels: Record<keyof LaptopSpec, string> = {
   coolingSystem: "Cooling System",
   geekbenchSingle: "Geekbench 6 (Single)",
   geekbenchMulti: "Geekbench 6 (Multi)",
+  cinebenchSingle: "Cinebench (Single)",
+  cinebenchMulti: "Cinebench (Multi)",
+  pcMark10: "PCMark 10",
 };
+
