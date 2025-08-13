@@ -19,7 +19,7 @@ export default function LandingPage() {
         </header>
 
         <section className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          <Card className="hover:shadow-lg transition-shadow">
+          <Card className="bg-card/80 backdrop-blur-sm border-primary/20 hover:border-primary/50 hover:shadow-primary/10 hover:shadow-lg transition-all duration-300">
             <CardHeader>
               <CardTitle className="flex items-center justify-center gap-3 font-headline text-3xl">
                 <Smartphone className="size-8 text-primary" />
@@ -30,13 +30,13 @@ export default function LandingPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button asChild size="lg" className="w-full hover:bg-primary hover:shadow-md hover:outline hover:outline-accent transition-shadow">
+              <Button asChild size="lg" className="w-full transition-all duration-300">
                 <Link href="/phone">Mulai Bandingkan Ponsel</Link>
               </Button>
             </CardContent>
           </Card>
           
-          <Card className="hover:shadow-lg transition-shadow">
+          <Card className="bg-card/80 backdrop-blur-sm border-accent/20 hover:border-accent/50 hover:shadow-accent/10 hover:shadow-lg transition-all duration-300">
             <CardHeader>
               <CardTitle className="flex items-center justify-center gap-3 font-headline text-3xl">
                 <Laptop className="size-8 text-accent" />
@@ -47,7 +47,7 @@ export default function LandingPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button asChild size="lg" className="w-full bg-accent hover:bg-accent hover:shadow-md hover:outline hover:outline-primary transition-shadow">
+              <Button asChild size="lg" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground transition-all duration-300">
                 <Link href="/laptop">Mulai Bandingkan Laptop</Link>
               </Button>
             </CardContent>

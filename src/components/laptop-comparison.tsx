@@ -24,11 +24,12 @@ type SpecGroup = {
 };
 
 const specStructure: SpecGroup[] = [
-    { label: "General", keys: ['price', 'releaseYear'] },
-    { label: "Performance", keys: ['processor', 'graphics', 'ram', 'storage'] },
+    { label: "General", keys: ['price', 'releaseYear', 'type'] },
+    { label: "Performance", keys: ['processor', 'graphics', 'ram', 'storage', 'coolingSystem'] },
     { label: "Display", keys: ['displaySize', 'displayResolution', 'aspectRatio', 'displayPanelType', 'sRgbCoverage', 'displayBrightness', 'displayRefreshRate', 'touchscreen'] },
-    { label: "Design & Portability", keys: ['weight', 'dimensions', 'material', 'ports', 'webcam', 'backlitKeyboard', 'fingerprintReader'] },
-    { label: "Portability & Features", keys: ['batteryCapacity', 'batteryLife', 'coolingSystem'] },
+    { label: "Design & Portability", keys: ['weight', 'dimensions', 'material'] },
+    { label: "Connectivity & Features", keys: ['ports', 'webcam', 'backlitKeyboard', 'fingerprintReader'] },
+    { label: "Battery", keys: ['batteryCapacity', 'batteryLife'] },
     { label: "Benchmark", keys: ['geekbenchSingle', 'geekbenchMulti', 'cinebenchSingle', 'cinebenchMulti', 'pcMark10'] },
 ];
 
@@ -119,7 +120,7 @@ export default function LaptopComparison({ laptops, onRemoveLaptop, model }: Lap
       <Card>
         <CardHeader>
           <CardTitle className="font-headline text-3xl">Spec Showdown</CardTitle>
-          <CardDescription className="font-body">Komparasi antar spek, jika unggul maka akan ada tropi, namun jika sama maka hanya akan menampilkan sorotan pada text.</CardDescription>
+          <CardDescription className="font-body">Komparasi antar spek, trofi untuk pemenang!</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
@@ -149,7 +150,12 @@ export default function LaptopComparison({ laptops, onRemoveLaptop, model }: Lap
               {loading && laptops.length > 1 ? renderSkeleton() : specStructure.map((group) => (
                 <React.Fragment key={group.label}>
                   <TableRow>
-                    <TableCell colSpan={laptops.length + 1} className="font-bold font-body text-lg p-2 bg-muted/50">{group.label}</TableCell>
+                    <TableCell colSpan={laptops.length + 1} className="font-bold font-body text-lg p-2 bg-muted/50">
+                      <div className="flex items-baseline">
+                        <span>{group.label}</span>
+                        {group.label === "Benchmark" && <span className="text-xs ml-4 text-muted-foreground">*Hasil ini hanya interpretasi gambaran, tidak sepenuhnya sesuai</span>}
+                      </div>
+                    </TableCell>
                   </TableRow>
                   {group.keys.map(key => {
                       const winnersForKey = winners[key] || [];
@@ -167,9 +173,20 @@ export default function LaptopComparison({ laptops, onRemoveLaptop, model }: Lap
                                   
                                   return (
                                       <TableCell key={laptop.id} className={`text-center align-middle transition-all ${isBest ? 'bg-accent/10' : ''}`}>
-                                          <div className={`p-2 rounded-md w-full h-full flex items-center justify-center gap-2 ${isSoloWinner && isBest ? 'bg-accent text-accent-foreground shadow-lg' : ''}`}>
-                                              {isSoloWinner && isBest && <Trophy className="w-4 h-4 shrink-0" />}
-                                              <span className="text-sm">{laptop.specs[key]}</span>
+                                          <div className={`p-2 rounded-md w-full h-full flex flex-col items-center justify-center gap-2 ${isSoloWinner && isBest ? 'bg-accent text-accent-foreground shadow-lg' : ''}`}>
+                                              {isSoloWinner && isBest && key !== 'graphics' && <Trophy className="w-4 h-4 shrink-0" />}
+                                              <div className="flex items-center justify-center gap-2">
+                                                {isSoloWinner && isBest && key === 'graphics' && <Trophy className="w-4 h-4 shrink-0" />}
+                                                <span className="text-sm">{laptop.specs[key]}</span>
+                                              </div>
+                                              
+                                              {key === 'graphics' && ((laptop.specs.flops && laptop.specs.flops !== 'N/A') || (laptop.specs.executionUnits && laptop.specs.executionUnits !== 'N/A') || (laptop.specs.tgp && laptop.specs.tgp !== 'N/A')) && (
+                                                <div className="text-xs text-muted-foreground border-t border-muted-foreground/20 pt-1 mt-1 w-full flex justify-center gap-2">
+                                                  {laptop.specs.flops && laptop.specs.flops !== 'N/A' && <span>{laptop.specs.flops}</span>}
+                                                  {laptop.specs.executionUnits && laptop.specs.executionUnits !== 'N/A' && <span>{laptop.specs.executionUnits}</span>}
+                                                  {laptop.specs.tgp && laptop.specs.tgp !== 'N/A' && <span>{laptop.specs.tgp}</span>}
+                                                </div>
+                                              )}
                                           </div>
                                       </TableCell>
                                   );

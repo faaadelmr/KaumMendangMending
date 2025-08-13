@@ -140,7 +140,7 @@ export default function PhoneComparison({ phones, onRemovePhone, model }: PhoneC
       <Card>
         <CardHeader>
           <CardTitle className="font-headline text-3xl">Spec Showdown</CardTitle>
-          <CardDescription className="font-body">Komparasi antar spek, jika unggul maka akan ada tropi, namun jika sama maka hanya akan menampilkan sorotan pada text.</CardDescription>
+          <CardDescription className="font-body">Komparasi antar spek, trofi untuk pemenang!</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
@@ -170,7 +170,12 @@ export default function PhoneComparison({ phones, onRemovePhone, model }: PhoneC
               {loading && phones.length > 1 ? renderSkeleton() : specStructure.map((group) => (
                 <React.Fragment key={group.label}>
                   <TableRow>
-                    <TableCell colSpan={phones.length + 1} className="font-bold font-body text-lg p-2 bg-muted/50">{group.label}</TableCell>
+                     <TableCell colSpan={phones.length + 1} className="font-bold font-body text-lg p-2 bg-muted/50">
+                      <div className="flex items-baseline">
+                        <span>{group.label}</span>
+                        {group.label === "Benchmark" && <span className="text-xs ml-4 text-muted-foreground">*Hasil ini hanya interpretasi gambaran, tidak sepenuhnya sesuai</span>}
+                      </div>
+                    </TableCell>
                   </TableRow>
                   
                   {group.isCompact ? (

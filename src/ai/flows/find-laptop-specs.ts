@@ -23,11 +23,15 @@ const FindLaptopSpecsOutputSchema = z.object({
   specs: z.object({
     price: z.string().describe("The approximate launch price in the Indonesian marketplace, formatted in IDR like 'Rp 25.000.000'."),
     releaseYear: z.string().describe("The year the laptop model was released."),
+    type: z.string().describe("The category of the laptop, e.g., 'Ultrabook', 'Gaming', 'Creator', 'Workstation', 'Handheld'."),
     color: z.string().describe("The available colors for the laptop, e.g., 'Silver, Space Gray'."),
     processor: z.string().describe("The full processor name, including generation and model, e.g., 'Intel Core Ultra 7 155H' or 'Apple M3 Pro'."),
     graphics: z.string().describe("The full graphics card name, including VRAM if available, e.g., 'NVIDIA GeForce RTX 4070 8GB' or 'Integrated Apple 18-core GPU'."),
-    ram: z.string().describe("The amount and type of RAM, e.g., '16GB DDR5'."),
-    storage: z.string().describe("The size and type of storage, e.g., '1TB NVMe SSD'."),
+    flops: z.string().describe("The theoretical FP32 performance of the GPU in TFLOPs, e.g., '12 TFLOPs'. Provide a number if possible."),
+    executionUnits: z.string().describe("The number of Execution Units (EUs) for integrated GPUs, e.g., '96 EU'. N/A for dedicated GPUs."),
+    tgp: z.string().describe("The Total Graphics Power (TGP) of the dedicated GPU in watts, e.g., '115W'. N/A for integrated GPUs."),
+    ram: z.string().describe("The amount and type of RAM, including upgradeability if known, e.g., '16GB DDR5 (1x16GB, 1 slot free)' or '16GB LPDDR5 (soldered)'. If soldered, indicate so."),
+    storage: z.string().describe("The size and type of storage, including upgradeability if known, e.g., '1TB NVMe SSD (1 slot used, 1 M.2 slot free)' or '512GB NVMe SSD (soldered)'. If soldered, indicate so."),
     displaySize: z.string().describe("The size of the display in inches, e.g., '15.6 inches'."),
     displayResolution: z.string().describe("The resolution of the display in pixels, e.g., '1920x1200'."),
     aspectRatio: z.string().describe("The aspect ratio of the display, e.g., '16:10'."),
@@ -68,6 +72,14 @@ const prompt = ai.definePrompt({
   Provide detailed and accurate specifications for every single field. Be very specific. For example, for 'processor', don't just say 'Intel i7', say 'Intel Core i7-13700H'.
   For benchmark scores, provide just the number. For Cinebench, include the version used (e.g., R23). For dimensions, provide it as W x H x T.
   
+  CRITICAL DETAILS TO FIND:
+  - 'type': Categorize the laptop (e.g., Ultrabook, Gaming, Handheld).
+  - 'ram': Specify if it's soldered or if there are empty slots. e.g., '16GB DDR5 (1 slot used, 1 slot free)'.
+  - 'storage': Specify if it's soldered or if there are empty M.2 slots. e.g., '1TB NVMe SSD (1 M.2 slot free)'.
+  - 'flops': FP32 TFLOPs for the GPU.
+  - 'executionUnits': Number of EUs for integrated graphics. 'N/A' for dedicated GPUs.
+  - 'tgp': Total Graphics Power for dedicated GPUs. 'N/A' for integrated GPUs.
+
   IMPORTANT: Find the price from the Indonesian marketplace and format it in Indonesian Rupiah (IDR), for example: "Rp 25.000.000".
 
   If the query is ambiguous (e.g., "latest Razer Blade"), use the most recent, popular model available from that lineup (e.g., the latest Razer Blade 15).

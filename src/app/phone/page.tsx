@@ -71,9 +71,9 @@ export default function Home() {
         <h1 className="text-5xl md:text-7xl font-headline font-bold text-primary-foreground/90 tracking-tight">
           Battle Phone Party
         </h1>
-        <p className="mt-4 text-lg md:text-xl text-muted-foreground font-body max-w-2xl mx-auto">
-          Kamu bisa membandingkan hingga 3 smartphone, kenapa cuma 3? soalnya keterbatasan AI dalam membandingkannya.
-          <br /><span className="text-sm text-muted-foreground font-body">Noted: Kalau komspanarasi tidak berjalan dengan baik, hapus salah satu yang telah ditambahkan.</span>
+        <p className="mt-2 leading-relaxed text-lg md:text-xl text-muted-foreground font-body max-w-2xl mx-auto">
+        Kamu bisa membandingkan hingga 3 smartphone. Perlu diketahui project ini menggunakan model AI dengan pengetahuan terbatas, maka dari itu kemungkinan teknologi terbaru belum dapat dikenali.
+        <br /><span className="text-xs text-muted-foreground font-body">Noted: kalau komparasi tidak berjalan dengan baik atau sepsifikasi tidak benar. <br className="" /> Gunakan penulisan spesifikasi yang detail misal(Samsung A15 5g) dan pilih "Better AI".</span>
         </p>
       </header>
       
@@ -85,7 +85,7 @@ export default function Home() {
             value={phoneName}
             onChange={(e) => setPhoneName(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && !loading && handleAddPhone()}
-            placeholder="e.g., 'Pixel 8' or 'iPhone 15, Galaxy S24'"
+            placeholder="e.g., 'Google Pixel 6 vs Pixel 6A' atau 'Samsung A15 5G'"
             className="flex-grow"
             disabled={loading || phones.length >= 3}
           />
@@ -103,11 +103,11 @@ export default function Home() {
             >
                 <Label htmlFor="fast-model" className="flex items-center gap-2 cursor-pointer">
                     <RadioGroupItem value="gemini-2.5-flash-lite" id="fast-model" />
-                    <span>Cepat</span>
+                    <span>Fast AI</span>
                 </Label>
                 <Label htmlFor="better-model" className="flex items-center gap-2 cursor-pointer">
                     <RadioGroupItem value="gemini-2.5-flash" id="better-model" />
-                    <span>Lebih Baik</span>
+                    <span>Better AI</span>
                 </Label>
             </RadioGroup>
         </div>

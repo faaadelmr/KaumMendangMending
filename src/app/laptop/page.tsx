@@ -70,8 +70,8 @@ export default function LaptopPage() {
           Battle Laptop Party
         </h1>
         <p className="mt-4 text-lg md:text-xl text-muted-foreground font-body max-w-2xl mx-auto">
-        Kamu bisa membandingkan hingga 3 smartphone, kenapa cuma 3? soalnya keterbatasan AI dalam membandingkannya.
-          <br /><span className="text-sm text-muted-foreground font-body">Noted: Kalau komspanarasi tidak berjalan dengan baik, hapus salah satu yang telah ditambahkan.</span>
+          Kamu bisa membandingkan hingga 3 Laptop atau Handheld. Perlu diketahui project ini menggunakan model AI dengan pengetahuan terbatas, maka dari itu kemungkinan teknologi terbaru belum dapat dikenali.
+          <br /><span className="text-xs text-muted-foreground font-body">Noted: kalau komparasi tidak berjalan dengan baik atau sepsifikasi tidak benar. <br className="" /> Gunakan penulisan spesifikasi yang detail misal (MSI Modern 14 Ryzen 3 4300U) dan pilih "Better AI".</span>
         </p>
       </header>
       
@@ -83,7 +83,7 @@ export default function LaptopPage() {
             value={laptopName}
             onChange={(e) => setLaptopName(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && !loading && handleAddLaptop()}
-            placeholder="e.g., 'Macbook Air M3' or 'Dell XPS 13, Surface Laptop 5'"
+            placeholder="e.g., 'Acer Swift Go AI SFG14 vs MSI Modern 14 C11M' atau 'Advan Workplus i5-1235U'"
             className="flex-grow"
             disabled={loading || laptops.length >= 3}
           />
@@ -102,11 +102,11 @@ export default function LaptopPage() {
             >
                 <Label htmlFor="fast-model" className="flex items-center gap-2 cursor-pointer">
                     <RadioGroupItem value="gemini-2.5-flash-lite" id="fast-model" />
-                    <span>Cepat</span>
+                    <span>Fast AI</span>
                 </Label>
                 <Label htmlFor="better-model" className="flex items-center gap-2 cursor-pointer">
                     <RadioGroupItem value="gemini-2.5-flash" id="better-model" />
-                    <span>Lebih Baik</span>
+                    <span>Better AI</span>
                 </Label>
             </RadioGroup>
         </div>

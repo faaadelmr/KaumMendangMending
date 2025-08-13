@@ -96,7 +96,7 @@ export const specLabels: Record<keyof Spec, string> = {
   sensors: "Sensors",
   batteryType: "Battery",
   batteryCharging: "Charging",
-  price: "Price (IDR)",
+  price: "Price (IDR) *Estimasi",
   geekbenchSingle: "Geekbench 6 (Single)",
   geekbenchMulti: "Geekbench 6 (Multi)",
   antutu: "AnTuTu",
@@ -109,13 +109,18 @@ export type LaptopSpec = {
   // GENERAL
   price: string;
   releaseYear: string;
+  type: string;
   color: string;
 
   // PERFORMANCE
   processor: string;
   graphics: string;
+  flops: string;
+  executionUnits: string;
+  tgp: string;
   ram: string;
   storage: string;
+  coolingSystem: string;
 
   // DISPLAY
   displaySize: string;
@@ -131,15 +136,16 @@ export type LaptopSpec = {
   weight: string;
   dimensions: string; // W x H x T
   material: string;
+
+  // CONNECTIVITY & FEATURES
   ports: string;
   webcam: string;
   backlitKeyboard: string;
   fingerprintReader: string;
   
-  // BATTERY & FEATURES
+  // BATTERY
   batteryCapacity: string;
   batteryLife: string;
-  coolingSystem: string;
 
   // BENCHMARKS
   geekbenchSingle: string;
@@ -157,11 +163,15 @@ export type Laptop = {
 }
 
 export const laptopSpecLabels: Record<keyof LaptopSpec, string> = {
-  price: "Price (IDR)",
+  price: "Price (IDR) *Estimasi",
   releaseYear: "Release Year",
+  type: "Type",
   color: "Color",
   processor: "Processor",
   graphics: "Graphics Card",
+  flops: "FLOPS (FP32)",
+  executionUnits: "Execution Units (EU)",
+  tgp: "TGP",
   ram: "RAM",
   storage: "Storage",
   displaySize: "Display Size",
@@ -188,4 +198,3 @@ export const laptopSpecLabels: Record<keyof LaptopSpec, string> = {
   cinebenchMulti: "Cinebench (Multi)",
   pcMark10: "PCMark 10",
 };
-

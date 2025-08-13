@@ -13,9 +13,14 @@ import {z} from 'genkit';
 import { laptopSpecLabels } from '@/lib/types';
 import type { Laptop } from '@/lib/types';
 
-// Dynamically create the output schema keys from laptopSpecLabels, excluding benchmarks and color
+// Dynamically create the output schema keys from laptopSpecLabels, excluding benchmarks and other non-comparable fields
 const filteredSpecLabels = { ...laptopSpecLabels };
 delete (filteredSpecLabels as any).color;
+delete (filteredSpecLabels as any).type;
+delete (filteredSpecLabels as any).aspectRatio;
+delete (filteredSpecLabels as any).flops;
+delete (filteredSpecLabels as any).executionUnits;
+delete (filteredSpecLabels as any).tgp;
 delete (filteredSpecLabels as any).geekbenchSingle;
 delete (filteredSpecLabels as any).geekbenchMulti;
 delete (filteredSpecLabels as any).cinebenchSingle;
@@ -25,7 +30,7 @@ delete (filteredSpecLabels as any).pcMark10;
 
 const winnerSchema = z.object(
   Object.fromEntries(
-    Object.keys(filteredSpecLabels).map(key => [key, z.array(z.string()).describe(`An array of model names of the laptops that have the best spec for ${laptopSpecLabels[key as keyof typeof laptopSpecLabels]}. An empty array if no clear winner.`)])
+    Object.keys(filteredSpecLabels).map(key => [key, z.array(z.string()).describe(`An array of model names of the laptops that have the best spec for ${key}. An empty array if no clear winner.`)])
   )
 ).describe('An object where each key is a spec ID and the value is an array of model names for the winning laptop(s). If there is a tie, include all tied models. If no clear winner, return an empty array.');
 export type Winners = z.infer<typeof winnerSchema>;
@@ -50,17 +55,16 @@ const prompt = ai.definePrompt({
   output: {schema: winnerSchema},
   prompt: `You are a world-renowned and meticulous laptop technical analyst. You will be given a JSON object of laptops to compare, structured as "Laptop 1", "Laptop 2", etc. Each laptop object contains its 'model' name and its 'specs'.
   
-Your task is to act as an expert and perform a comprehensive "VERSUS" comparison to determine which laptop is the best for **each individual specification key inside the 'specs' object, EXCLUDING 'color' and all benchmark scores (geekbench, cinebench, pcMark10)**. Your analysis must be nuanced and reflect deep technical knowledge. Follow these rules precisely:
+Your task is to act as an expert and perform a comprehensive "VERSUS" comparison to determine which laptop is the best for **each individual specification key inside the 'specs' object, EXCLUDING the following fields: 'color', 'type', 'aspectRatio', 'flops', 'executionUnits', 'tgp', and all benchmark scores (geekbench, cinebench, pcMark10)**. Your analysis must be nuanced and reflect deep technical knowledge. Follow these rules precisely:
 - For 'price', the **lowest** value is the best.
 - For 'releaseYear', the **highest** (newest) year is the best.
-- For 'ram' (e.g., '16GB DDR5'), consider both capacity and type/speed. Higher capacity is better. For the same capacity, newer technology (DDR5 > DDR4) is better.
-- For 'storage' (e.g., '1TB NVMe SSD'), consider both capacity and type. Higher capacity is better. For the same capacity, NVMe is better than a standard SSD.
+- For 'ram' (e.g., '16GB DDR5'), consider both capacity and type/speed. Higher capacity is better. For the same capacity, newer technology (DDR5 > DDR4) is better. Also consider upgradeability info.
+- For 'storage' (e.g., '1TB NVMe SSD'), consider both capacity and type. Higher capacity is better. For the same capacity, NVMe is better than a standard SSD. Also consider upgradeability info.
 - For 'displaySize', 'displayRefreshRate', 'batteryCapacity', 'batteryLife', 'sRgbCoverage', and 'displayBrightness' the **highest** numeric value is the best. These have been pre-parsed for you.
 - For 'weight', the **lowest** value is the best. This has been pre-parsed for you.
 - For 'processor' and 'graphics', this is critical. You MUST use your deep expert knowledge of computer hardware. Do not just look at clock speeds or VRAM. Analyze the architecture (e.g., Intel Core Ultra vs. Core i-series, Apple M-series generations, NVIDIA RTX 40-series vs 30-series), core counts, cache sizes, and your knowledge of real-world performance benchmarks to determine the superior component.
 - For 'displayPanelType', OLED is generally superior to Mini-LED, which is better than IPS, which is better than VA/TN.
 - For 'ports', more modern and versatile ports (like Thunderbolt 4/USB4) are better. Also consider the variety and number of ports.
-- For 'aspectRatio' (e.g., "16:10" vs "16:9"), taller ratios like 16:10 or 3:2 are generally better for productivity.
 - For 'coolingSystem', use your knowledge of thermal design. Systems with dual fans, vapor chambers, or more heat pipes are superior to basic single-fan systems.
 - For 'touchscreen', 'backlitKeyboard', and 'fingerprintReader', 'Yes' is better than 'No'.
 
@@ -111,10 +115,15 @@ const compareLaptopSpecsFlow = ai.defineFlow(
             'cinebenchSingle',
             'cinebenchMulti',
             'pcMark10',
+            'flops',
+            'executionUnits',
+            'tgp',
         ];
 
         for (const key of numericKeys) {
-            processedSpecs[key] = parseNumeric(laptop.specs[key]);
+            if (key in processedSpecs) {
+                processedSpecs[key] = parseNumeric(laptop.specs[key as keyof typeof laptop.specs]);
+            }
         }
 
         // Remove color from specs for comparison
