@@ -12,6 +12,9 @@ export type Spec = {
   displaySize: string;
   displayResolution: string;
   displayProtection: string;
+  displayType: string; // e.g., AMOLED, IPS LCD
+  displayRefreshRate: string; // e.g., 120Hz
+  displayBrightness: string; // e.g., 1200 nits (peak)
 
   // PLATFORM
   os: string;
@@ -74,6 +77,9 @@ export const specLabels: Record<keyof Spec, string> = {
   displaySize: "Size",
   displayResolution: "Resolution",
   displayProtection: "Protection",
+  displayType: "Panel Type",
+  displayRefreshRate: "Refresh Rate",
+  displayBrightness: "Peak Brightness",
   os: "OS",
   osUpdate: "OS Update Promise",
   processorChipset: "Chipset",

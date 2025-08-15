@@ -52,6 +52,8 @@ const prompt = ai.definePrompt({
   
 Your task is to act as an expert and perform a comprehensive "VERSUS" comparison to determine which phone is the best for **each individual specification key inside the 'specs' object, EXCLUDING 'brand', 'color', and all benchmark scores (geekbench, antutu, threeDMark)**. Your analysis must be nuanced and reflect deep technical knowledge. Follow these rules precisely:
 - For 'price', the **lowest** value is the best.
+- For 'displayRefreshRate' and 'displayBrightness', parse the numeric value (e.g., '120Hz' -> 120, '1800 nits' -> 1800) and the **highest** value is the best.
+- For 'displayType', use your knowledge of screen technology. OLED/AMOLED variants are generally superior to IPS/LCD.
 - For numeric specs like 'displaySize', 'batteryType' (capacity), higher is generally better.
 - For complex, non-numeric specs like 'os', 'processorChipset', 'mainCameraModules', and 'selfieCameraModules', use your deep expert knowledge to determine the superior option. Don't just count megapixels or cores; consider the overall quality, performance, and user experience. For chipsets, analyze their architecture and real-world performance. For cameras, consider sensor quality, features, and video capabilities.
 - For specs like 'osUpdate', parse the string (e.g., "7 years") to find the numeric value for comparison. Higher is better.

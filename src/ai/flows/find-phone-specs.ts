@@ -28,6 +28,9 @@ const FindPhoneSpecsOutputSchema = z.object({
     displaySize: z.string().describe("The size of the display in inches."),
     displayResolution: z.string().describe("The resolution of the display in pixels."),
     displayProtection: z.string().describe("The type of screen protection (e.g., 'Gorilla Glass Victus 2')."),
+    displayType: z.string().describe("The panel technology of the display, e.g., 'AMOLED', 'IPS LCD'."),
+    displayRefreshRate: z.string().describe("The refresh rate of the display in Hz, e.g., '120Hz'."),
+    displayBrightness: z.string().describe("The peak brightness of the display in nits, e.g., '1800 nits'."),
     os: z.string().describe("The operating system the phone runs on."),
     osUpdate: z.string().describe("The promised duration of OS updates in years (e.g., '7 years')."),
     processorChipset: z.string().describe("The chipset model. Be very specific, e.g., 'Unisoc T606', not just 'Unisoc'"),
@@ -77,6 +80,9 @@ const prompt = ai.definePrompt({
   If the query is ambiguous (e.g., "latest samsung phone" or "newest pixel"), then you can use the most recent, popular, high-end model available from that brand (e.g., the latest Galaxy S Ultra).
   
   Ensure you provide specific details for the following:
+  - 'displayType': The specific panel technology, e.g., 'Super Retina XDR OLED', 'Dynamic LTPO AMOLED 2X'.
+  - 'displayRefreshRate': The display refresh rate in Hz.
+  - 'displayBrightness': The peak brightness in nits.
   - 'osUpdate': The promised duration of OS updates, formatted like '7 years'.
   - 'batteryType': The capacity in mAh, formatted like 'Li-Ion 5050 mAh'.
   - 'brand': The brand name of the phone.

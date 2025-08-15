@@ -26,7 +26,7 @@ type SpecGroup = {
 
 const specStructure: SpecGroup[] = [
     { label: "General", keys: ['price', 'announced', 'sim'] },
-    { label: "Display", keys: ['displaySize', 'displayResolution', 'displayProtection', 'dimensions'], isCompact: true },
+    { label: "Display", keys: ['displaySize', 'displayResolution', 'displayProtection', 'displayType', 'displayRefreshRate', 'displayBrightness', 'dimensions'], isCompact: true },
     { label: "Platform", keys: ['os', 'osUpdate', 'processorChipset', 'processorCpu', 'processorGpu'], isCompact: true },
     { label: "Storage", keys: ['storageRam', 'storageType', 'ramType'] },
     { label: "Main Camera", keys: ['mainCameraModules', 'mainCameraFeatures', 'mainCameraVideo'], isCompact: true },
