@@ -45,6 +45,7 @@ const FindPhoneSpecsOutputSchema = z.object({
     selfieCameraModules: z.string().describe("The modules of the selfie camera."),
     selfieCameraFeatures: z.string().describe("The features of the selfie camera."),
     selfieCameraVideo: z.string().describe("The video recording capabilities of the selfie camera."),
+    network: z.string().describe("The network technology, e.g., 'GSM / HSPA / LTE / 5G'."),
     nfc: z.string().describe("Whether NFC is supported."),
     ipRating: z.string().describe("The IP rating for dust and water resistance (e.g., 'IP68')."),
     sim: z.string().describe("The SIM card configuration (e.g., 'Nano-SIM, eSIM')."),
@@ -87,6 +88,7 @@ const prompt = ai.definePrompt({
   - 'batteryType': The capacity in mAh, formatted like 'Li-Ion 5050 mAh'.
   - 'brand': The brand name of the phone.
   - 'color': The available colors.
+  - 'network': The network technology (e.g., "5G").
   - 'ipRating': The dust and water resistance rating.
   - 'sim': The SIM card setup.
   - 'dimensions': The phone's dimensions as W x H x T in mm.

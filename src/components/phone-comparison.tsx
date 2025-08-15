@@ -31,7 +31,7 @@ const specStructure: SpecGroup[] = [
     { label: "Storage", keys: ['storageRam', 'storageType', 'ramType'] },
     { label: "Main Camera", keys: ['mainCameraModules', 'mainCameraFeatures', 'mainCameraVideo'], isCompact: true },
     { label: "Selfie Camera", keys: ['selfieCameraModules', 'selfieCameraFeatures', 'selfieCameraVideo'], isCompact: true },
-    { label: "Comms & Features", keys: ['nfc', 'usb', 'sensors', 'ipRating', 'bluetooth'], isCompact: true },
+    { label: "Comms & Features", keys: ['network', 'nfc', 'usb', 'sensors', 'ipRating', 'bluetooth'], isCompact: true },
     { label: "Battery", keys: ['batteryType', 'batteryCharging'], isCompact: true },
     { label: "Benchmark", keys: ['geekbenchSingle', 'geekbenchMulti', 'antutu', 'threeDMark'] },
 ];

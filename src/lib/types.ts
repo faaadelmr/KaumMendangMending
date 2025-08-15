@@ -39,6 +39,7 @@ export type Spec = {
   selfieCameraVideo: string;
 
   // COMMS
+  network: string;
   nfc: string;
   ipRating: string;
   sim: string;
@@ -94,6 +95,7 @@ export const specLabels: Record<keyof Spec, string> = {
   selfieCameraModules: "Modules",
   selfieCameraFeatures: "Features",
   selfieCameraVideo: "Video",
+  network: "Network",
   nfc: "NFC",
   ipRating: "IP Rating",
   sim: "SIM",
@@ -121,9 +123,9 @@ export type LaptopSpec = {
   // PERFORMANCE
   processor: string;
   graphics: string;
-  flops: string;
-  executionUnits: string;
-  tgp: string;
+  flops: string | null;
+  executionUnits: string | null;
+  tgp: string | null;
   ram: string;
   storage: string;
   coolingSystem: string;
